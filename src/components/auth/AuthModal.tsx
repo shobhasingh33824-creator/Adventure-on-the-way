@@ -39,34 +39,34 @@ export const AuthModal: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanId = email.trim().toLowerCase();
-    const cleanPass = password.trim();
+    const rawId = email.trim();
+    const cleanId = rawId.toLowerCase();
+    const rawPass = password.trim();
 
-    // Check Admin credentials first: ID ( @admin ) PASSWORD ( ADMIN123 )
+    // Check Admin login attempt: require exact ID (@admin) and exact PASSWORD (ADMIN123)
     if (
       cleanId === '@admin' ||
       cleanId === 'admin' ||
-      cleanId === 'admin@adventureontheway.com'
+      cleanId === 'admin@adventureontheway.com' ||
+      cleanId === 'admin@adventure.com'
     ) {
-      if (
-        cleanPass === 'ADMIN123' ||
-        cleanPass.toUpperCase() === 'ADMIN123' ||
-        cleanPass === 'Admin@123'
-      ) {
-        login(email, password);
+      if (rawId === '@admin' && rawPass === 'ADMIN123') {
+        login(rawId, rawPass);
+        setEmail('');
+        setPassword('');
         return;
       } else {
-        showToast('Invalid Admin Password! Use ID: @admin and PASSWORD: ADMIN123', 'error');
+        showToast('Access Denied: Incorrect Admin ID or Password.', 'error');
         return;
       }
     }
 
-    if (!email.trim()) {
-      showToast('Please enter your Email or Admin ID (@admin).', 'error');
+    if (!rawId) {
+      showToast('Please enter your Email or Admin ID.', 'error');
       return;
     }
 
-    // Trigger OTP flow for customer login
+    // Trigger OTP flow for regular customer login
     setShowOtpScreen(true);
     showToast(`OTP sent to ${email}! (Code: ${generatedMockOtp})`, 'info');
   };
@@ -84,13 +84,6 @@ export const AuthModal: React.FC = () => {
   const handleAutoFillOtp = () => {
     setOtpCode(generatedMockOtp);
     showToast('Demo OTP auto-filled!', 'success');
-  };
-
-  const handleFillAdminCredentials = () => {
-    setMode('signin');
-    setEmail('@admin');
-    setPassword('ADMIN123');
-    showToast('Admin ID (@admin) & Password (ADMIN123) filled!', 'info');
   };
 
   return (
@@ -210,7 +203,7 @@ export const AuthModal: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3" autoComplete="off">
               {mode === 'signup' && (
                 <>
                   <div className="space-y-1">
@@ -248,7 +241,7 @@ export const AuthModal: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  Login ID or Email Address (Admin ID: <span className="text-[#FF6B35]">@admin</span>)
+                  Email Address or Admin ID
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
@@ -256,7 +249,8 @@ export const AuthModal: React.FC = () => {
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="@admin or explorer@adventure.com"
+                    placeholder="Enter your email or Admin ID"
+                    autoComplete="off"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                     required
                   />
@@ -265,7 +259,7 @@ export const AuthModal: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  Password (Admin Password: <span className="text-emerald-600 dark:text-emerald-400">ADMIN123</span>)
+                  Password
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
@@ -273,7 +267,8 @@ export const AuthModal: React.FC = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="ADMIN123 or your password"
+                    placeholder="Enter your password"
+                    autoComplete="new-password"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                     required
                   />
@@ -282,7 +277,7 @@ export const AuthModal: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl font-bold text-sm text-white shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 rounded-xl font-bold text-sm text-white shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 mt-2 cursor-pointer"
                 style={{ backgroundColor: settings.accentColor }}
               >
                 <span>{mode === 'signin' ? 'Login Now' : 'Create Free Account'}</span>
@@ -290,29 +285,11 @@ export const AuthModal: React.FC = () => {
               </button>
             </form>
 
-            {/* Admin Credentials Quick Fill Box */}
-            <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2 text-xs">
-              <div className="font-mono text-[11px]">
-                <span className="font-bold text-zinc-700 dark:text-zinc-200">Admin ID: </span>
-                <strong className="text-[#FF6B35]">@admin</strong>
-                <span className="mx-1.5 text-zinc-400">|</span>
-                <span className="font-bold text-zinc-700 dark:text-zinc-200">Pass: </span>
-                <strong className="text-emerald-600 dark:text-emerald-400">ADMIN123</strong>
-              </div>
-              <button
-                type="button"
-                onClick={handleFillAdminCredentials}
-                className="px-2.5 py-1 rounded-lg bg-[#0B3D2E] text-white font-bold text-[10px] shrink-0 hover:opacity-90"
-              >
-                Auto-Fill
-              </button>
-            </div>
-
-            {/* Social & Google Login */}
+            {/* Social & Google Login (For Customers Only) */}
             <button
               type="button"
               onClick={loginWithGoogle}
-              className="w-full py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800 transition flex items-center justify-center gap-2.5 shadow-xs"
+              className="w-full py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800 transition flex items-center justify-center gap-2.5 shadow-xs cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -332,28 +309,18 @@ export const AuthModal: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>Continue with Google</span>
+              <span>Continue with Google (Customer)</span>
             </button>
 
-            {/* Quick 1-Click Access Bar */}
-            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={loginAsDemoUser}
-                  className="py-2 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition"
-                >
-                  👤 Demo Traveler
-                </button>
-                <button
-                  type="button"
-                  onClick={loginAsAdmin}
-                  className="py-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-bold text-xs transition flex items-center justify-center gap-1"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Admin (@admin)</span>
-                </button>
-              </div>
+            {/* Quick Customer Demo Access */}
+            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
+              <button
+                type="button"
+                onClick={loginAsDemoUser}
+                className="w-full py-2 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer"
+              >
+                👤 Continue as Guest / Demo Traveler
+              </button>
             </div>
           </div>
         )}

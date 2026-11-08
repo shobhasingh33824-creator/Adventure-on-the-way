@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   TourPackage,
@@ -77,15 +77,17 @@ export const AdminPanel: React.FC = () => {
     showToast,
     currentUser,
     login,
-    loginAsAdmin,
+    logout,
     setActiveTab,
     darkMode,
     toggleDarkMode,
   } = useApp();
 
-  // Admin Gate Login State
-  const [adminGateId, setAdminGateId] = useState('@admin');
-  const [adminGatePass, setAdminGatePass] = useState('ADMIN123');
+  // Admin Gate Login State (Strictly empty by default — requires typing @admin and ADMIN123)
+  const [adminGateId, setAdminGateId] = useState('');
+  const [adminGatePass, setAdminGatePass] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const [currentTab, setCurrentTab] = useState<
     | 'dashboard'
@@ -203,110 +205,17 @@ export const AdminPanel: React.FC = () => {
   // UI Customizer State
   const [tempSettings, setTempSettings] = useState(settings);
 
-  // Admin access gate check
-  if (!currentUser || currentUser.role !== 'admin') {
-    const handleGateSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      const ok = login(adminGateId.trim(), adminGatePass.trim());
-      if (!ok) {
-        showToast('Invalid Admin ID or Password. Use ID: @admin and PASSWORD: ADMIN123', 'error');
-      }
-    };
+  useEffect(() => {
+    setTempSettings(settings);
+  }, [settings]);
 
-    return (
-      <div className="min-h-[82vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center space-y-5">
-          <div className="w-16 h-16 rounded-3xl bg-[#0B3D2E] text-white mx-auto flex items-center justify-center shadow-lg">
-            <ShieldCheck className="w-8 h-8 text-[#FF6B35]" />
-          </div>
-          <div>
-            <h2 className="font-poppins font-black text-xl sm:text-2xl text-zinc-900 dark:text-white">
-              Om Travels & Adventure On The Way
-            </h2>
-            <p className="text-xs text-zinc-500 mt-1">
-              Super Admin Portal • 4, Devpura, Haridwar
-            </p>
-            <div className="mt-3 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left text-xs space-y-1 font-mono flex items-center justify-between gap-2">
-              <div>
-                <p className="text-zinc-700 dark:text-zinc-200">
-                  Admin ID: <strong className="text-[#FF6B35] font-black">@admin</strong>
-                </p>
-                <p className="text-zinc-700 dark:text-zinc-200">
-                  Password: <strong className="text-emerald-600 dark:text-emerald-400 font-black">ADMIN123</strong>
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminGateId('@admin');
-                  setAdminGatePass('ADMIN123');
-                }}
-                className="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-sans font-bold text-[10px] hover:bg-emerald-700 transition cursor-pointer shrink-0"
-              >
-                Auto-Fill
-              </button>
-            </div>
-          </div>
+  useEffect(() => {
+    if (!assignTourId && packages.length > 0) {
+      setAssignTourId(packages[0].id);
+    }
+  }, [packages, assignTourId]);
 
-          <form onSubmit={handleGateSubmit} className="space-y-3 text-left">
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
-                Admin Login ID
-              </label>
-              <input
-                type="text"
-                required
-                value={adminGateId}
-                onChange={(e) => setAdminGateId(e.target.value)}
-                placeholder="@admin"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
-                Admin Password
-              </label>
-              <input
-                type="password"
-                required
-                value={adminGatePass}
-                onChange={(e) => setAdminGatePass(e.target.value)}
-                placeholder="ADMIN123"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-2xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 hover:opacity-90 transition cursor-pointer"
-              style={{ backgroundColor: settings.primaryColor }}
-            >
-              <ShieldCheck className="w-4 h-4 text-[#FF6B35]" />
-              <span>Login to Super Admin (@admin)</span>
-            </button>
-          </form>
-
-          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={loginAsAdmin}
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
-            >
-              ⚡ Instant 1-Click Admin Access
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('home')}
-              className="text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
-            >
-              ← Return to Website
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ================= Analytics Calculations =================
+  // ================= Analytics & Memoized Filters (Must run before any early return) =================
   const confirmedBookings = bookings.filter((b) => b.bookingStatus !== 'Cancelled');
   const allTimeRevenue = confirmedBookings.reduce(
     (sum, b) => sum + (b.advanceAmount || b.totalAmount),
@@ -359,6 +268,107 @@ export const AdminPanel: React.FC = () => {
       return true;
     });
   }, [gallery, galleryCategoryFilter, gallerySearch]);
+
+  // Strict Admin access gate check: Only users who explicitly logged in with @admin and ADMIN123 can view
+  if (!currentUser || currentUser.role !== 'admin' || currentUser.email !== '@admin') {
+    const handleGateSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      const enteredId = adminGateId.trim();
+      const enteredPass = adminGatePass.trim();
+
+      if (enteredId === '@admin' && enteredPass === 'ADMIN123') {
+        setAdminLoginError('');
+        login(enteredId, enteredPass);
+        setAdminGateId('');
+        setAdminGatePass('');
+      } else {
+        setAdminLoginError('Access Denied: Incorrect Admin ID or Password.');
+        showToast('Access Denied: Please enter the valid Admin ID and Password.', 'error');
+      }
+    };
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-100 dark:bg-[#0c0c0e]">
+        <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center space-y-5">
+          <div className="w-16 h-16 rounded-3xl bg-[#0B3D2E] text-white mx-auto flex items-center justify-center shadow-lg">
+            <ShieldCheck className="w-8 h-8 text-[#FF6B35]" />
+          </div>
+          <div>
+            <h2 className="font-poppins font-black text-xl sm:text-2xl text-zinc-900 dark:text-white">
+              Om Travels & Adventure On The Way
+            </h2>
+            <p className="text-xs text-zinc-500 mt-1">
+              Restricted Super Admin Portal • 4, Devpura, Haridwar
+            </p>
+            <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-2">
+              🔒 Authorized Administrator Login Required
+            </p>
+          </div>
+
+          {adminLoginError && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold">
+              {adminLoginError}
+            </div>
+          )}
+
+          <form onSubmit={handleGateSubmit} className="space-y-3.5 text-left" autoComplete="off">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
+                Admin Login ID *
+              </label>
+              <input
+                type="text"
+                required
+                value={adminGateId}
+                onChange={(e) => {
+                  setAdminGateId(e.target.value);
+                  if (adminLoginError) setAdminLoginError('');
+                }}
+                placeholder="Enter Admin ID"
+                autoComplete="off"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
+                Admin Password *
+              </label>
+              <input
+                type="password"
+                required
+                value={adminGatePass}
+                onChange={(e) => {
+                  setAdminGatePass(e.target.value);
+                  if (adminLoginError) setAdminLoginError('');
+                }}
+                placeholder="Enter Admin Password"
+                autoComplete="new-password"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-2xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 hover:opacity-90 transition cursor-pointer"
+              style={{ backgroundColor: settings.primaryColor }}
+            >
+              <ShieldCheck className="w-4 h-4 text-[#FF6B35]" />
+              <span>Verify & Enter Admin Control Center</span>
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setActiveTab('home')}
+              className="text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
+            >
+              ← Return to Public Website
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Destination Form Actions
   const handleOpenAddDestination = (quickMode = false) => {
@@ -766,13 +776,22 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => setActiveTab('home')}
-            className="w-full py-2.5 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-xs font-bold text-zinc-700 dark:text-zinc-200 transition flex items-center justify-center gap-2"
-          >
-            <Compass className="w-4 h-4 text-[#FF6B35]" />
-            <span>Return to Public Website</span>
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setActiveTab('home')}
+              className="py-2.5 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-xs font-bold text-zinc-700 dark:text-zinc-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Compass className="w-4 h-4 text-[#FF6B35]" />
+              <span>Website</span>
+            </button>
+            <button
+              onClick={() => logout()}
+              className="py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-600 dark:text-rose-400 border border-rose-500/30 transition flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+              <span>Lock Admin</span>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -1450,20 +1469,33 @@ export const AdminPanel: React.FC = () => {
                                 Duplicate
                               </button>
 
-                              <button
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      `Are you sure you want to permanently delete "${pkg.title}"?`
-                                    )
-                                  ) {
-                                    deletePackage(pkg.id);
-                                  }
-                                }}
-                                className="p-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 transition"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              {confirmDeleteId === pkg.id ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <button
+                                    onClick={() => {
+                                      deletePackage(pkg.id);
+                                      setConfirmDeleteId(null);
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition cursor-pointer"
+                                  >
+                                    Confirm Delete
+                                  </button>
+                                  <button
+                                    onClick={() => setConfirmDeleteId(null)}
+                                    className="px-2 py-1.5 rounded-xl bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs cursor-pointer"
+                                  >
+                                    Cancel
+                                  </button>
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => setConfirmDeleteId(pkg.id)}
+                                  className="p-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 transition cursor-pointer"
+                                  title="Delete Tour Package"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </td>
                           </tr>
                         );
@@ -2774,10 +2806,10 @@ export const AdminPanel: React.FC = () => {
 
                 <button
                   onClick={() => {
-                    setGalleryCoverForTour(selectedGalleryItem.url, assignTourId);
+                    setGalleryCoverForTour(assignTourId, selectedGalleryItem.url);
                     setSelectedGalleryItem(null);
                   }}
-                  className="px-4 py-2 rounded-xl bg-[#FF6B35] text-white font-bold flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-[#FF6B35] text-white font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Star className="w-3.5 h-3.5" />
                   <span>Set as Cover Photo</span>

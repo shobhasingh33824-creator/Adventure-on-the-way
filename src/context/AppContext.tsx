@@ -303,12 +303,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (res.ok) {
           const synced = await res.json();
           if (synced.user) {
-            setCurrentUser(synced.user);
+            const safeCustomerUser: User = { ...synced.user, role: 'user' };
+            setCurrentUser((prev) => (prev?.role === 'admin' ? prev : safeCustomerUser));
             setAllUsers((prev) => {
-              const exists = prev.some((u) => u.id === synced.user.id);
+              const exists = prev.some((u) => u.id === safeCustomerUser.id);
               return exists
-                ? prev.map((u) => (u.id === synced.user.id ? synced.user : u))
-                : [synced.user, ...prev];
+                ? prev.map((u) => (u.id === safeCustomerUser.id ? safeCustomerUser : u))
+                : [safeCustomerUser, ...prev];
             });
           }
           if (Array.isArray(synced.wishlist) && synced.wishlist.length > 0) {
@@ -670,7 +671,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (res.ok) {
         const synced = await res.json();
         if (synced.user) {
-          setCurrentUser(synced.user);
+          setCurrentUser({ ...synced.user, role: 'user' });
         }
       }
       setAuthModalOpen(false);
@@ -688,43 +689,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const login = (email: string, pass: string): boolean => {
-    const cleanId = email.trim().toLowerCase();
-    const cleanPass = pass.trim();
+    const rawId = email.trim();
+    const cleanId = rawId.toLowerCase();
+    const rawPass = pass.trim();
 
+    // Strict Admin check: ONLY exact ID "@admin" and exact Password "ADMIN123" can log in as admin
     if (
-      (cleanId === '@admin' ||
-        cleanId === 'admin' ||
-        cleanId === 'admin@adventureontheway.com' ||
-        cleanId === 'admin@adventure.com') &&
-      (cleanPass === 'ADMIN123' ||
-        cleanPass.toUpperCase() === 'ADMIN123' ||
-        cleanPass === 'Admin@123')
+      cleanId === '@admin' ||
+      cleanId === 'admin' ||
+      cleanId === 'admin@adventureontheway.com' ||
+      cleanId === 'admin@adventure.com'
     ) {
-      const adminUser: User = {
-        id: 'usr-admin-1',
-        name: 'Om Travels Admin (@admin)',
-        email: '@admin',
-        phone: '+91 94217 09258',
-        avatar: '/assets/aistudio/Screenshot_20261108-104735_f720548e.png',
-        role: 'admin',
-        createdAt: '2025-01-01',
-      };
-      setCurrentUser(adminUser);
-      setAuthModalOpen(false);
-      showToast('Welcome, Admin (@admin)! Launching Super Admin Control Center.', 'success');
-      setActiveTab('admin');
-      return true;
+      if (rawId === '@admin' && rawPass === 'ADMIN123') {
+        const adminUser: User = {
+          id: 'usr-admin-1',
+          name: 'Om Travels Admin (@admin)',
+          email: '@admin',
+          phone: '+91 94217 09258',
+          avatar: '/assets/aistudio/Screenshot_20261108-104735_f720548e.png',
+          role: 'admin',
+          createdAt: '2025-01-01',
+        };
+        setCurrentUser(adminUser);
+        setAuthModalOpen(false);
+        showToast('Authenticated as Super Admin (@admin)!', 'success');
+        setActiveTab('admin');
+        return true;
+      } else {
+        showToast('Access Denied: Please enter the exact Admin ID and Password.', 'error');
+        return false;
+      }
     }
 
-    const found = allUsers.find((u) => u.email.toLowerCase() === cleanId);
+    const found = allUsers.find(
+      (u) => u.email.toLowerCase() === cleanId && u.role !== 'admin'
+    );
     if (found) {
       if (found.isBlocked) {
         showToast('Your account is currently disabled. Please contact support.', 'error');
         return false;
       }
-      setCurrentUser(found);
+      const customerUser: User = { ...found, role: 'user' };
+      setCurrentUser(customerUser);
       setAuthModalOpen(false);
-      showToast(`Welcome back, ${found.name}!`, 'success');
+      showToast(`Welcome back, ${customerUser.name}!`, 'success');
       return true;
     }
 
@@ -747,13 +755,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loginAsDemoUser = () => {
     const demoUser = allUsers.find((u) => u.role === 'user') || initialUsers[1];
-    setCurrentUser(demoUser);
+    setCurrentUser({ ...demoUser, role: 'user' });
     setAuthModalOpen(false);
     showToast(`Logged in as Yatri: ${demoUser.name}`, 'success');
   };
 
   const loginAsAdmin = () => {
-    login('@admin', 'ADMIN123');
+    setAuthModalOpen(false);
+    setActiveTab('admin');
+    showToast('Please enter your Admin ID and Password to access the Admin Panel.', 'info');
   };
 
   const logout = async () => {
@@ -801,19 +811,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAllUsers((prev) =>
       prev.map((u) => (u.id === id ? { ...u, isBlocked: nextBlocked } : u))
     );
-    if (authTokenRef.current) {
-      try {
-        const headers = await getAuthHeaders();
-        await fetch(`/api/users/${encodeURIComponent(id)}`, {
-          method: 'PATCH',
-          headers,
-          body: JSON.stringify({ isBlocked: nextBlocked }),
-        });
-      } catch (err) {
-        console.error('Failed to update user block status:', err);
-      }
+    try {
+      const headers = await getAuthHeaders();
+      await fetch(`/api/users/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ isBlocked: nextBlocked }),
+      });
+    } catch (err) {
+      console.error('Failed to update user block status:', err);
     }
-    showToast('User status updated.', 'info');
+    showToast(`User account ${nextBlocked ? 'blocked' : 'unblocked'}.`, 'info');
   };
 
   const markNotificationRead = (id: string) => {

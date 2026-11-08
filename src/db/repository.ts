@@ -403,9 +403,6 @@ export async function getOrCreateUser(
   avatar?: string
 ): Promise<{ user: User; wishlist: string[] }> {
   try {
-    const isAdminEmail =
-      email.toLowerCase() === 'admin@adventureontheway.com' ||
-      email.toLowerCase() === 'shobhasingh33824@gmail.com';
     const result = await db
       .insert(users)
       .values({
@@ -416,7 +413,7 @@ export async function getOrCreateUser(
         profileImageUrl:
           avatar ||
           'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
-        role: isAdminEmail ? 'admin' : 'user',
+        role: 'user',
         isBlocked: false,
         totalBookings: 0,
         wishlist: ['chardham-yatra-uttarakhand'],
@@ -425,6 +422,7 @@ export async function getOrCreateUser(
         target: users.uid,
         set: {
           email,
+          role: 'user',
           ...(fullName ? { fullName } : {}),
           ...(avatar ? { profileImageUrl: avatar } : {}),
         },
@@ -433,7 +431,7 @@ export async function getOrCreateUser(
 
     const row = result[0];
     return {
-      user: mapRowToUser(row),
+      user: { ...mapRowToUser(row), role: 'user' },
       wishlist: Array.isArray(row.wishlist) ? row.wishlist : [],
     };
   } catch (error) {

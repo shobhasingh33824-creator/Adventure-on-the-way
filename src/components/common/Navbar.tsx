@@ -289,10 +289,10 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => handleNavClick('admin')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition shadow-2xs cursor-pointer"
-            title="Super Admin Portal (ID: @admin / PASS: ADMIN123)"
+            title="Super Admin Portal"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Admin (@admin)</span>
+            <span>Admin Portal</span>
           </button>
         </nav>
 
@@ -555,13 +555,13 @@ export const Navbar: React.FC = () => {
               className="px-4 py-2.5 rounded-xl text-sm font-bold text-left bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Admin (@admin)</span>
+              <span>Admin Portal</span>
             </button>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800 text-xs">
             <span className="font-semibold text-zinc-500">
-              Admin ID: <strong className="text-[#FF6B35]">@admin</strong> • Pass: <strong className="text-emerald-600">ADMIN123</strong>
+              📍 4, Devpura, Haridwar • 📞 +91 94217 09258
             </span>
             <button
               onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
