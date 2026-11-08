@@ -688,16 +688,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const login = (email: string, pass: string): boolean => {
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanId = email.trim().toLowerCase();
+    const cleanPass = pass.trim();
 
     if (
-      (cleanEmail === 'admin@adventureontheway.com' && pass === 'Admin@123') ||
-      (cleanEmail === 'admin@adventure.com' && pass === 'admin123')
+      (cleanId === '@admin' ||
+        cleanId === 'admin' ||
+        cleanId === 'admin@adventureontheway.com' ||
+        cleanId === 'admin@adventure.com') &&
+      (cleanPass === 'ADMIN123' ||
+        cleanPass.toUpperCase() === 'ADMIN123' ||
+        cleanPass === 'Admin@123')
     ) {
       const adminUser: User = {
         id: 'usr-admin-1',
-        name: 'Om Travels Admin (Haridwar HQ)',
-        email: 'admin@adventureontheway.com',
+        name: 'Om Travels Admin (@admin)',
+        email: '@admin',
         phone: '+91 94217 09258',
         avatar: '/assets/aistudio/Screenshot_20261108-104735_f720548e.png',
         role: 'admin',
@@ -705,12 +711,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
       setCurrentUser(adminUser);
       setAuthModalOpen(false);
-      showToast('Welcome, Om Travels Admin! Launching Haridwar HQ Control Center.', 'success');
+      showToast('Welcome, Admin (@admin)! Launching Super Admin Control Center.', 'success');
       setActiveTab('admin');
       return true;
     }
 
-    const found = allUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+    const found = allUsers.find((u) => u.email.toLowerCase() === cleanId);
     if (found) {
       if (found.isBlocked) {
         showToast('Your account is currently disabled. Please contact support.', 'error');
@@ -724,7 +730,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const newUser: User = {
       id: `usr-${Date.now()}`,
-      name: email.split('@')[0].toUpperCase(),
+      name: email.replace('@', '').split('@')[0].toUpperCase() || 'ADVENTURER',
       email,
       phone: '+91 94217 09258',
       avatar:
@@ -747,7 +753,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loginAsAdmin = () => {
-    login('admin@adventureontheway.com', 'Admin@123');
+    login('@admin', 'ADMIN123');
   };
 
   const logout = async () => {

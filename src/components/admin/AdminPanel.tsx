@@ -76,11 +76,16 @@ export const AdminPanel: React.FC = () => {
     formatPrice,
     showToast,
     currentUser,
+    login,
     loginAsAdmin,
     setActiveTab,
     darkMode,
     toggleDarkMode,
   } = useApp();
+
+  // Admin Gate Login State
+  const [adminGateId, setAdminGateId] = useState('@admin');
+  const [adminGatePass, setAdminGatePass] = useState('ADMIN123');
 
   const [currentTab, setCurrentTab] = useState<
     | 'dashboard'
@@ -200,36 +205,102 @@ export const AdminPanel: React.FC = () => {
 
   // Admin access gate check
   if (!currentUser || currentUser.role !== 'admin') {
+    const handleGateSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      const ok = login(adminGateId.trim(), adminGatePass.trim());
+      if (!ok) {
+        showToast('Invalid Admin ID or Password. Use ID: @admin and PASSWORD: ADMIN123', 'error');
+      }
+    };
+
     return (
-      <div className="min-h-[80vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center space-y-5">
+      <div className="min-h-[82vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center space-y-5">
           <div className="w-16 h-16 rounded-3xl bg-[#0B3D2E] text-white mx-auto flex items-center justify-center shadow-lg">
             <ShieldCheck className="w-8 h-8 text-[#FF6B35]" />
           </div>
           <div>
-            <h2 className="font-poppins font-black text-2xl text-zinc-900 dark:text-white">
+            <h2 className="font-poppins font-black text-xl sm:text-2xl text-zinc-900 dark:text-white">
               Om Travels & Adventure On The Way
             </h2>
             <p className="text-xs text-zinc-500 mt-1">
-              Super Admin Portal (4, Devpura, Haridwar)
+              Super Admin Portal • 4, Devpura, Haridwar
             </p>
-            <div className="mt-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-left text-xs space-y-1 font-mono">
-              <p>
-                Email: <strong className="text-[#FF6B35]">admin@adventureontheway.com</strong>
-              </p>
-              <p>
-                Password: <strong className="text-emerald-500">Admin@123</strong>
-              </p>
+            <div className="mt-3 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left text-xs space-y-1 font-mono flex items-center justify-between gap-2">
+              <div>
+                <p className="text-zinc-700 dark:text-zinc-200">
+                  Admin ID: <strong className="text-[#FF6B35] font-black">@admin</strong>
+                </p>
+                <p className="text-zinc-700 dark:text-zinc-200">
+                  Password: <strong className="text-emerald-600 dark:text-emerald-400 font-black">ADMIN123</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminGateId('@admin');
+                  setAdminGatePass('ADMIN123');
+                }}
+                className="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-sans font-bold text-[10px] hover:bg-emerald-700 transition cursor-pointer shrink-0"
+              >
+                Auto-Fill
+              </button>
             </div>
           </div>
-          <button
-            onClick={loginAsAdmin}
-            className="w-full py-3.5 rounded-2xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 hover:opacity-90 transition"
-            style={{ backgroundColor: settings.primaryColor }}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Launch Super Admin Control Center</span>
-          </button>
+
+          <form onSubmit={handleGateSubmit} className="space-y-3 text-left">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
+                Admin Login ID
+              </label>
+              <input
+                type="text"
+                required
+                value={adminGateId}
+                onChange={(e) => setAdminGateId(e.target.value)}
+                placeholder="@admin"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-1">
+                Admin Password
+              </label>
+              <input
+                type="password"
+                required
+                value={adminGatePass}
+                onChange={(e) => setAdminGatePass(e.target.value)}
+                placeholder="ADMIN123"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-2xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 hover:opacity-90 transition cursor-pointer"
+              style={{ backgroundColor: settings.primaryColor }}
+            >
+              <ShieldCheck className="w-4 h-4 text-[#FF6B35]" />
+              <span>Login to Super Admin (@admin)</span>
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={loginAsAdmin}
+              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+            >
+              ⚡ Instant 1-Click Admin Access
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('home')}
+              className="text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
+            >
+              ← Return to Website
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -687,9 +758,11 @@ export const AdminPanel: React.FC = () => {
             />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                {currentUser.name}
+                {currentUser.name} (@admin)
               </p>
-              <p className="text-[10px] text-zinc-400 truncate">+91 94217 09258</p>
+              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold truncate">
+                ID: @admin • +91 94217 09258
+              </p>
             </div>
           </div>
 
@@ -705,10 +778,10 @@ export const AdminPanel: React.FC = () => {
 
       {/* ================= MAIN CONTENT AREA ================= */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#141417]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between gap-4 no-print">
-          <div>
-            <h1 className="font-poppins font-black text-xl text-zinc-900 dark:text-white capitalize">
+        {/* Top Header Bar - Responsive across Mobile, Tablet, and Desktop with NO hidden buttons */}
+        <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#141417]/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 no-print">
+          <div className="min-w-0">
+            <h1 className="font-poppins font-black text-base sm:text-xl text-zinc-900 dark:text-white capitalize">
               {currentTab === 'dashboard' && 'Executive Performance Dashboard'}
               {currentTab === 'destinations' && 'Manage Uttarakhand & Himalayan Tours'}
               {currentTab === 'gallery' && 'Device Gallery & Tour Photo Manager'}
@@ -719,27 +792,35 @@ export const AdminPanel: React.FC = () => {
               {currentTab === 'offers' && 'Promo Offers & Discount Coupons'}
               {currentTab === 'settings' && 'Logo, Hero Banner & Haridwar Office Settings'}
             </h1>
-            <p className="text-xs text-zinc-400">
-              Om Travels & Adventure On The Way • <strong className="text-zinc-700 dark:text-zinc-200">+91 94217 09258 / +91 86687 40237</strong> • UPI: <strong className="text-[#FF6B35]">9421709258@upi</strong>
+            <p className="text-[11px] sm:text-xs text-zinc-400">
+              Admin ID: <strong className="text-emerald-500">@admin</strong> • <strong className="text-zinc-700 dark:text-zinc-200">+91 94217 09258 / +91 86687 40237</strong> • UPI: <strong className="text-[#FF6B35]">9421709258@upi</strong>
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setCurrentTab('gallery')}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 transition hidden sm:flex items-center gap-1.5"
+              className="px-3 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 transition flex items-center gap-1.5 cursor-pointer"
             >
               <ImageIcon className="w-4 h-4 text-[#FF6B35]" />
               <span>Gallery ({gallery.length})</span>
             </button>
 
             <button
+              onClick={() => handleOpenAddDestination(true)}
+              className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Camera className="w-4 h-4" />
+              <span>3-Step Quick Add</span>
+            </button>
+
+            <button
               onClick={() => handleOpenAddDestination(false)}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md flex items-center gap-2 hover:opacity-95 transition"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-md flex items-center gap-1.5 hover:opacity-95 transition cursor-pointer"
               style={{ backgroundColor: settings.accentColor }}
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add New Tour</span>
+              <span>Add New Tour</span>
             </button>
 
             {/* Notification Bell Dropdown */}

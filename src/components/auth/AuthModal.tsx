@@ -39,23 +39,36 @@ export const AuthModal: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes('@')) {
-      showToast('Please enter a valid email address.', 'error');
-      return;
-    }
+    const cleanId = email.trim().toLowerCase();
+    const cleanPass = password.trim();
 
-    // If regular admin credentials
+    // Check Admin credentials first: ID ( @admin ) PASSWORD ( ADMIN123 )
     if (
-      (email.trim().toLowerCase() === 'admin@adventureontheway.com' && password === 'Admin@123') ||
-      (email.trim().toLowerCase() === 'admin@adventure.com' && password === 'admin123')
+      cleanId === '@admin' ||
+      cleanId === 'admin' ||
+      cleanId === 'admin@adventureontheway.com'
     ) {
-      login(email, password);
+      if (
+        cleanPass === 'ADMIN123' ||
+        cleanPass.toUpperCase() === 'ADMIN123' ||
+        cleanPass === 'Admin@123'
+      ) {
+        login(email, password);
+        return;
+      } else {
+        showToast('Invalid Admin Password! Use ID: @admin and PASSWORD: ADMIN123', 'error');
+        return;
+      }
+    }
+
+    if (!email.trim()) {
+      showToast('Please enter your Email or Admin ID (@admin).', 'error');
       return;
     }
 
-    // Trigger OTP flow for real simulation feel
+    // Trigger OTP flow for customer login
     setShowOtpScreen(true);
-    showToast(`Simulation OTP sent to ${email}! (Code: ${generatedMockOtp})`, 'info');
+    showToast(`OTP sent to ${email}! (Code: ${generatedMockOtp})`, 'info');
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
@@ -73,10 +86,17 @@ export const AuthModal: React.FC = () => {
     showToast('Demo OTP auto-filled!', 'success');
   };
 
+  const handleFillAdminCredentials = () => {
+    setMode('signin');
+    setEmail('@admin');
+    setPassword('ADMIN123');
+    showToast('Admin ID (@admin) & Password (ADMIN123) filled!', 'info');
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-3 animate-in fade-in">
       <div
-        className="relative w-full max-w-md bg-[#FFF8F0] dark:bg-[#111111] rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 p-6 sm:p-8"
+        className="relative w-full max-w-md bg-[#FFF8F0] dark:bg-[#111111] rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 p-5 sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -85,15 +105,15 @@ export const AuthModal: React.FC = () => {
             setAuthModalOpen(false);
             setShowOtpScreen(false);
           }}
-          className="absolute top-5 right-5 p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+          className="absolute top-4 right-4 p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Branding Header */}
-        <div className="text-center space-y-1 mb-6">
+        <div className="text-center space-y-1 mb-5">
           <div
-            className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg mb-3"
+            className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg mb-2"
             style={{ backgroundColor: settings.primaryColor }}
           >
             <Sparkles className="w-6 h-6 text-[#FF6B35]" />
@@ -102,8 +122,8 @@ export const AuthModal: React.FC = () => {
             {showOtpScreen
               ? 'Verify Your Account'
               : mode === 'signin'
-              ? 'Welcome Adventurer'
-              : 'Join The Expedition'}
+              ? 'Sign In / Admin Login'
+              : 'Join Om Travels'}
           </h3>
           <p className="text-xs text-zinc-500">
             {showOtpScreen
@@ -116,7 +136,9 @@ export const AuthModal: React.FC = () => {
         {showOtpScreen ? (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-300 flex items-center justify-between">
-              <span>Demo Security Code: <strong>{generatedMockOtp}</strong></span>
+              <span>
+                Security Code: <strong>{generatedMockOtp}</strong>
+              </span>
               <button
                 type="button"
                 onClick={handleAutoFillOtp}
@@ -156,12 +178,12 @@ export const AuthModal: React.FC = () => {
               onClick={() => setShowOtpScreen(false)}
               className="w-full text-center text-xs text-zinc-500 hover:underline pt-1"
             >
-              Back to Email Login
+              Back to Login
             </button>
           </form>
         ) : (
           /* Normal Sign In / Sign Up Form */
-          <div className="space-y-5">
+          <div className="space-y-4">
             {/* Mode Tabs */}
             <div className="flex rounded-xl bg-zinc-100 dark:bg-zinc-800/80 p-1 text-xs font-bold">
               <button
@@ -173,7 +195,7 @@ export const AuthModal: React.FC = () => {
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Sign In
+                Sign In / Admin
               </button>
               <button
                 type="button"
@@ -184,11 +206,11 @@ export const AuthModal: React.FC = () => {
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                New Adventurer
+                New Traveler
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {mode === 'signup' && (
                 <>
                   <div className="space-y-1">
@@ -226,16 +248,16 @@ export const AuthModal: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  Email Address
+                  Login ID or Email Address (Admin ID: <span className="text-[#FF6B35]">@admin</span>)
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
                   <input
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="explorer@adventure.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                    placeholder="@admin or explorer@adventure.com"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                     required
                   />
                 </div>
@@ -243,7 +265,7 @@ export const AuthModal: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  Password
+                  Password (Admin Password: <span className="text-emerald-600 dark:text-emerald-400">ADMIN123</span>)
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
@@ -251,8 +273,8 @@ export const AuthModal: React.FC = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                    placeholder="ADMIN123 or your password"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                     required
                   />
                 </div>
@@ -263,23 +285,30 @@ export const AuthModal: React.FC = () => {
                 className="w-full py-3 rounded-xl font-bold text-sm text-white shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 mt-2"
                 style={{ backgroundColor: settings.accentColor }}
               >
-                <span>{mode === 'signin' ? 'Sign In / Request OTP' : 'Create Free Account'}</span>
+                <span>{mode === 'signin' ? 'Login Now' : 'Create Free Account'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
-            {/* Social & Google Login */}
-            <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+            {/* Admin Credentials Quick Fill Box */}
+            <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2 text-xs">
+              <div className="font-mono text-[11px]">
+                <span className="font-bold text-zinc-700 dark:text-zinc-200">Admin ID: </span>
+                <strong className="text-[#FF6B35]">@admin</strong>
+                <span className="mx-1.5 text-zinc-400">|</span>
+                <span className="font-bold text-zinc-700 dark:text-zinc-200">Pass: </span>
+                <strong className="text-emerald-600 dark:text-emerald-400">ADMIN123</strong>
               </div>
-              <div className="relative flex justify-center text-[11px] uppercase tracking-wider font-semibold">
-                <span className="bg-[#FFF8F0] dark:bg-[#111111] px-3 text-zinc-400">
-                  Or Instant Sign In With
-                </span>
-              </div>
+              <button
+                type="button"
+                onClick={handleFillAdminCredentials}
+                className="px-2.5 py-1 rounded-lg bg-[#0B3D2E] text-white font-bold text-[10px] shrink-0 hover:opacity-90"
+              >
+                Auto-Fill
+              </button>
             </div>
 
+            {/* Social & Google Login */}
             <button
               type="button"
               onClick={loginWithGoogle}
@@ -306,11 +335,8 @@ export const AuthModal: React.FC = () => {
               <span>Continue with Google</span>
             </button>
 
-            {/* Quick Demo Access Bar */}
+            {/* Quick 1-Click Access Bar */}
             <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block text-center">
-                Instant Demo Access (1-Click)
-              </span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -325,7 +351,7 @@ export const AuthModal: React.FC = () => {
                   className="py-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-bold text-xs transition flex items-center justify-center gap-1"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Demo Admin</span>
+                  <span>Admin (@admin)</span>
                 </button>
               </div>
             </div>
