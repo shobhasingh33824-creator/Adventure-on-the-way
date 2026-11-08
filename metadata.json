@@ -1,0 +1,6 @@
+{
+  "name": "Adventure on the Way",
+  "description": "Don't Just Travel, Live The Adventure. Premium tour and adventure travel booking platform for Himalayan expeditions, bike trips, treks, and wild getaways.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

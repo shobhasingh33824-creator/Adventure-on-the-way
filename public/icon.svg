@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0B3D2E" />
+      <stop offset="100%" stop-color="#07261D" />
+    </linearGradient>
+    <linearGradient id="orangePeak" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A50" />
+      <stop offset="100%" stop-color="#FF6B35" />
+    </linearGradient>
+    <linearGradient id="mainPeak" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A614A" />
+      <stop offset="100%" stop-color="#0D3B2D" />
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A50" />
+      <stop offset="100%" stop-color="#FF6B35" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle / canvas -->
+  <rect width="512" height="512" rx="104" fill="url(#skyGrad)" />
+  
+  <!-- Outer subtle circular border ring -->
+  <circle cx="256" cy="256" r="216" stroke="#FF6B35" stroke-width="4" stroke-opacity="0.25" stroke-dasharray="8 8" />
+
+  <!-- Sun / Dawn glowing behind mountains -->
+  <circle cx="256" cy="190" r="70" fill="#FF6B35" fill-opacity="0.2" filter="blur(20px)" />
+  <circle cx="256" cy="190" r="48" fill="#FF6B35" fill-opacity="0.9" />
+
+  <!-- Background Mountain (Sunset Orange Peak) -->
+  <polygon points="320,160 420,360 220,360" fill="url(#orangePeak)" opacity="0.95" filter="url(#shadow)" />
+  <!-- Snowcap on orange peak -->
+  <polygon points="320,160 345,210 330,200 320,215 310,200 295,210" fill="#FFF8F0" />
+
+  <!-- Main Himalayan Mountain (Deep Green with Snowcap) -->
+  <polygon points="190,110 340,380 40,380" fill="url(#mainPeak)" filter="url(#shadow)" />
+  <!-- Snowcap on Main Peak -->
+  <polygon points="190,110 228,180 205,170 190,190 175,170 152,180" fill="#FFF8F0" />
+  <!-- Mountain ridge highlight -->
+  <polyline points="190,110 195,260 220,380" stroke="#FFF8F0" stroke-width="3" stroke-opacity="0.4" />
+
+  <!-- Third foreground peak left -->
+  <polygon points="110,240 210,380 10,380" fill="#0B3D2E" opacity="0.8" />
+
+  <!-- Winding Adventure Road cutting forward -->
+  <path d="M 230 290 Q 280 340 180 420 T 260 512" fill="none" stroke="url(#roadGrad)" stroke-width="42" stroke-linecap="round" />
+  <path d="M 230 290 Q 280 340 180 420 T 260 512" fill="none" stroke="#FFF8F0" stroke-width="6" stroke-linecap="round" stroke-dasharray="16 14" />
+
+  <!-- Compass Star / Waypoint at the Top -->
+  <g transform="translate(410, 100)">
+    <polygon points="0,-24 7,-7 24,0 7,7 0,24 -7,7 -24,0 -7,-7" fill="#FFF8F0" />
+    <circle cx="0" cy="0" r="3.5" fill="#FF6B35" />
+  </g>
+</svg>
