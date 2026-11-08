@@ -670,7 +670,7 @@ export const AdminPanel: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-[#0c0c0e] text-zinc-900 dark:text-zinc-100 flex flex-col lg:flex-row transition-colors">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-zinc-100 dark:bg-[#0c0c0e] text-zinc-900 dark:text-zinc-100 flex flex-col lg:flex-row transition-colors">
       {/* ================= DESKTOP LEFT SIDEBAR ================= */}
       <aside className="hidden lg:flex lg:w-68 xl:w-72 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto bg-white dark:bg-[#141417] border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between shrink-0 no-print">
         <div>
@@ -947,7 +947,7 @@ export const AdminPanel: React.FC = () => {
         </header>
 
         {/* Content Body */}
-        <main className="p-4 sm:p-6 lg:p-8 space-y-8 flex-1 overflow-y-auto">
+        <main className="p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 flex-1 min-w-0 max-w-full overflow-x-hidden">
           {/* ================= SECTION 1: SUPER ADVANCED DASHBOARD ================= */}
           {currentTab === 'dashboard' && (
             <div className="space-y-8">

@@ -16,10 +16,10 @@ export const TrendingSlider: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-[#FFF8F0] dark:bg-[#111111] transition-colors">
+    <section className="py-12 sm:py-16 w-full max-w-full overflow-hidden bg-[#FFF8F0] dark:bg-[#111111] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B35] animate-ping" />
@@ -56,13 +56,13 @@ export const TrendingSlider: React.FC = () => {
         {/* Horizontal Slider */}
         <div
           ref={scrollRef}
-          className="flex items-stretch gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="flex items-stretch gap-4 sm:gap-6 overflow-x-auto no-scrollbar pb-4"
         >
           {trendingPackages.map((pkg) => (
             <div
               key={pkg.id}
               onClick={() => setSelectedPackage(pkg)}
-              className="group min-w-[280px] sm:min-w-[320px] max-w-[320px] rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer shrink-0"
+              className="group min-w-[260px] sm:min-w-[300px] max-w-[82vw] sm:max-w-[320px] rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer shrink-0"
             >
               {/* Image banner */}
               <div className="relative aspect-16/10 overflow-hidden bg-zinc-800">

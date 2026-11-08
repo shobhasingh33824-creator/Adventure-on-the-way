@@ -26,9 +26,9 @@ export const Logo: React.FC<{ className?: string; isLight?: boolean }> = ({
   const { settings } = useApp();
 
   return (
-    <div className={`flex items-center gap-3 select-none ${className}`}>
+    <div className={`flex items-center gap-2 sm:gap-3 min-w-0 select-none ${className}`}>
       {/* Circular Brown Emblem Logo from Screenshot (Mountains + Adventure Jeep + Dashed Road) */}
-      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden border-2 border-white dark:border-amber-200/80 ring-2 ring-[#3B2314] bg-[#3B2314] transition-transform duration-300 hover:scale-105 shrink-0">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md relative overflow-hidden border-2 border-white dark:border-amber-200/80 ring-1 ring-[#3B2314] bg-[#3B2314] shrink-0">
         {settings.logoUrl ? (
           <img
             src={settings.logoUrl}
@@ -135,12 +135,12 @@ export const Logo: React.FC<{ className?: string; isLight?: boolean }> = ({
         )}
       </div>
 
-      <div className="flex flex-col min-w-0">
-        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase text-[#FF6B35] leading-none truncate">
+      <div className="flex flex-col min-w-0 overflow-hidden">
+        <span className="text-[8px] sm:text-[10px] font-extrabold tracking-wider uppercase text-[#FF6B35] leading-none truncate">
           OM TRAVELS • HARIDWAR
         </span>
         <span
-          className={`font-poppins font-extrabold text-sm sm:text-base lg:text-lg tracking-tight leading-tight truncate ${
+          className={`font-poppins font-extrabold text-xs sm:text-sm lg:text-base tracking-tight leading-tight truncate ${
             isLight ? 'text-white' : 'text-zinc-900 dark:text-white'
           }`}
         >
@@ -202,27 +202,27 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Slim Non-Sticky Top Contact Bar (Scrolls away naturally so it never blocks the screen) */}
-      <div className="bg-[#0B3D2E] text-white text-[11px] py-1.5 px-3 sm:px-6 border-b border-white/10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar whitespace-nowrap">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-300">
+      <div className="w-full max-w-full overflow-hidden bg-[#0B3D2E] text-white text-[10px] sm:text-[11px] py-1 px-2.5 sm:px-6 border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="inline-flex items-center gap-1 font-semibold text-emerald-300 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Open 24 Hours
+              24×7 Open
             </span>
             <span className="text-white/30">·</span>
-            <span className="text-zinc-200">4, Devpura, Haridwar</span>
+            <span className="text-zinc-200 truncate">4, Devpura, Haridwar</span>
           </div>
-          <div className="flex items-center gap-3 font-semibold">
+          <div className="flex items-center gap-2 font-semibold shrink-0">
             <a
               href={settings.callLink || 'tel:+919421709258'}
               className="hover:text-[#FF6B35] transition"
             >
               +91 94217 09258
             </a>
-            <span className="text-white/30">·</span>
+            <span className="text-white/30 hidden sm:inline">·</span>
             <a
               href={settings.secondaryCallLink || 'tel:+918668740237'}
-              className="hover:text-[#FF6B35] transition"
+              className="hover:text-[#FF6B35] transition hidden sm:inline"
             >
               +91 86687 40237
             </a>
@@ -230,13 +230,13 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Single-Row Compact Sticky Header (Only ~60px tall on mobile, never wraps) */}
-      <header className="sticky top-0 z-40 w-full bg-[#FFF8F0]/95 dark:bg-[#111111]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      {/* Single-Row Compact Sticky Header (Only 56px tall on mobile, fits 100% of screen width) */}
+      <header className="sticky top-0 z-40 w-full max-w-full bg-[#FFF8F0]/95 dark:bg-[#111111]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Brand Logo */}
           <div
             onClick={() => handleNavClick('home')}
-            className="cursor-pointer shrink-0 min-w-0"
+            className="cursor-pointer min-w-0 flex-1 lg:flex-initial overflow-hidden"
           >
             <Logo />
           </div>
@@ -391,7 +391,7 @@ export const Navbar: React.FC = () => {
             {/* Primary Book Now CTA Button */}
             <button
               onClick={() => handleNavClick('destinations')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-sm hover:opacity-95 transition cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-95 transition cursor-pointer whitespace-nowrap shrink-0"
               style={{ backgroundColor: settings.accentColor }}
             >
               <span>{t('bookNow')}</span>
@@ -400,7 +400,7 @@ export const Navbar: React.FC = () => {
             {/* Mobile/Tablet Menu Drawer Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+              className="lg:hidden p-1.5 sm:p-2 rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 cursor-pointer shrink-0"
               aria-label="Open menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

@@ -46,7 +46,7 @@ const MainContent: React.FC = () => {
   // If Admin Tab is active, render the dedicated separate Admin Layout with Sidebar
   if (activeTab === 'admin') {
     return (
-      <div className="min-h-screen bg-zinc-100 dark:bg-[#0c0c0e] text-zinc-900 dark:text-zinc-100 selection:bg-[#FF6B35] selection:text-white">
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-zinc-100 dark:bg-[#0c0c0e] text-zinc-900 dark:text-zinc-100 selection:bg-[#FF6B35] selection:text-white">
         <AdminPanel />
         <ToastContainer />
         <AuthModal />
@@ -55,7 +55,7 @@ const MainContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF8F0] dark:bg-[#111111] text-[#111111] dark:text-[#FFF8F0] transition-colors selection:bg-[#FF6B35] selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#FFF8F0] dark:bg-[#111111] text-[#111111] dark:text-[#FFF8F0] transition-colors selection:bg-[#FF6B35] selection:text-white">
       {/* PWA Install Banner */}
       <PWAInstallPrompt />
 
@@ -63,7 +63,7 @@ const MainContent: React.FC = () => {
       <Navbar />
 
       {/* Main Public Page Rendering with bottom padding on mobile for MakeMyTrip style bottom bar */}
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden pb-20 lg:pb-0">
         {activeTab === 'home' && (
           <>
             <HeroSection />

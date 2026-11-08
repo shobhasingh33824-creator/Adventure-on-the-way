@@ -31,24 +31,24 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-[#111111] text-zinc-300 pt-16 pb-20 md:pb-12 border-t border-zinc-800">
+    <footer className="w-full max-w-full overflow-hidden bg-[#111111] text-zinc-300 pt-12 sm:pt-16 pb-20 lg:pb-12 border-t border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Instagram 71,175 Followers Community Banner */}
-        <div className="mb-12 rounded-3xl bg-gradient-to-r from-[#2b170c] via-[#0B3D2E] to-[#1a1110] p-6 sm:p-8 border border-amber-500/30 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 p-0.5 shrink-0 shadow-lg">
+        <div className="mb-10 sm:mb-12 rounded-3xl bg-gradient-to-r from-[#2b170c] via-[#0B3D2E] to-[#1a1110] p-5 sm:p-8 border border-amber-500/30 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 p-0.5 shrink-0 shadow-lg">
               <div className="w-full h-full bg-zinc-950 rounded-[14px] flex items-center justify-center">
-                <Instagram className="w-8 h-8 text-white" />
+                <Instagram className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
-            <div>
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold mb-1">
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs font-bold mb-1">
                 <span>71,175 Followers</span>
                 <span>•</span>
-                <span>Verified Travel Community</span>
+                <span>Verified Community</span>
               </div>
-              <h3 className="text-white font-poppins font-extrabold text-lg sm:text-2xl">
-                Follow {settings.instagramHandle || '@adventure_on_the_way'} on Instagram
+              <h3 className="text-white font-poppins font-extrabold text-base sm:text-2xl truncate">
+                Follow {settings.instagramHandle || '@adventure_on_the_way'}
               </h3>
               <p className="text-xs sm:text-sm text-zinc-300 mt-0.5">
                 Daily live darshan updates from Kedarnath, Badrinath, Aadi Kailash &amp; Haridwar HQ!
@@ -60,42 +60,42 @@ export const Footer: React.FC = () => {
             href={settings.instagramUrl || 'https://instagram.com/adventure_on_the_way'}
             target="_blank"
             rel="noreferrer"
-            className="px-6 py-3.5 rounded-2xl bg-[#FF6B35] hover:bg-[#e85a25] text-white font-bold text-sm flex items-center gap-2 shadow-xl transition shrink-0"
+            className="w-full md:w-auto justify-center px-5 py-3 rounded-2xl bg-[#FF6B35] hover:bg-[#e85a25] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl transition shrink-0"
           >
-            <Instagram className="w-4 h-4" />
-            <span>Follow @adventure_on_the_way (71.1K)</span>
-            <ExternalLink className="w-4 h-4" />
+            <Instagram className="w-4 h-4 shrink-0" />
+            <span className="truncate">Follow @adventure_on_the_way (71.1K)</span>
+            <ExternalLink className="w-4 h-4 shrink-0" />
           </a>
         </div>
 
         {/* Top Badges Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 border-b border-zinc-800 text-center">
-          <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-            <ShieldCheck className="w-8 h-8 text-[#FF6B35]" />
-            <h4 className="text-white font-bold text-sm">Uttarakhand Regd.</h4>
-            <p className="text-xs text-zinc-400">Official Haridwar Tour Operator</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 pb-10 sm:pb-12 border-b border-zinc-800 text-center">
+          <div className="flex flex-col items-center gap-2 p-3.5 sm:p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF6B35]" />
+            <h4 className="text-white font-bold text-xs sm:text-sm">Uttarakhand Regd.</h4>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Official Haridwar Tour Operator</p>
           </div>
-          <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-            <Award className="w-8 h-8 text-[#FF6B35]" />
-            <h4 className="text-white font-bold text-sm">Best Price Direct</h4>
-            <p className="text-xs text-zinc-400">Own Fleet &amp; Verified Hotels</p>
+          <div className="flex flex-col items-center gap-2 p-3.5 sm:p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            <Award className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF6B35]" />
+            <h4 className="text-white font-bold text-xs sm:text-sm">Best Price Direct</h4>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Own Fleet &amp; Verified Hotels</p>
           </div>
-          <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-            <Clock className="w-8 h-8 text-emerald-400" />
-            <h4 className="text-white font-bold text-sm">Open 24 Hours</h4>
-            <p className="text-xs text-emerald-400 font-semibold">Open Now • 4, Devpura, Haridwar</p>
+          <div className="flex flex-col items-center gap-2 p-3.5 sm:p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-400" />
+            <h4 className="text-white font-bold text-xs sm:text-sm">Open 24 Hours</h4>
+            <p className="text-[11px] sm:text-xs text-emerald-400 font-semibold">Open Now • 4, Devpura, Haridwar</p>
           </div>
-          <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-            <Heart className="w-8 h-8 text-[#FF6B35]" />
-            <h4 className="text-white font-bold text-sm">71,175+ Community</h4>
-            <p className="text-xs text-zinc-400">4.9/5 Star Verified Yatri Rating</p>
+          <div className="flex flex-col items-center gap-2 p-3.5 sm:p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            <Heart className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF6B35]" />
+            <h4 className="text-white font-bold text-xs sm:text-sm">71,175+ Community</h4>
+            <p className="text-[11px] sm:text-xs text-zinc-400">4.9/5 Star Verified Yatri Rating</p>
           </div>
         </div>
 
         {/* Main Footer Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10 py-10 sm:py-12">
           {/* Brand & About */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 min-w-0">
             <Logo isLight />
             <p className="text-xs sm:text-sm text-zinc-300 font-semibold">
               {settings.tagline}
@@ -109,13 +109,13 @@ export const Footer: React.FC = () => {
               <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
                 Get ₹2,000 Off Chardham &amp; Uttarakhand Packages
               </label>
-              <div className="flex items-center gap-2 max-w-sm">
+              <div className="flex items-center gap-2 w-full max-w-sm">
                 <input
                   type="email"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF6B35] flex-1"
+                  className="min-w-0 bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF6B35] flex-1"
                 />
                 <button
                   type="submit"
