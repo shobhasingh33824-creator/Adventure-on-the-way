@@ -8,147 +8,171 @@ import {
   Send,
   MessageSquare,
   CheckCircle2,
-  Shield,
-  HelpCircle,
+  Instagram,
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
-  const { settings, showToast } = useApp();
+  const { settings, packages, addEnquiry, showToast } = useApp();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [tourInterest, setTourInterest] = useState('Spiti Valley Ultimate 4x4 Circuit');
+  const [tourInterest, setTourInterest] = useState(
+    packages[0]?.title || 'Chardham Yatra (Yamunotri, Gangotri, Kedarnath, Badrinath)'
+  );
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      showToast('Please fill out all required fields.', 'error');
+    if (!name.trim() || !phone.trim() || !message.trim()) {
+      showToast('Please fill out your name, phone number, and message.', 'error');
       return;
     }
 
     setIsSubmitting(true);
+    addEnquiry({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || 'yatri@adventureontheway.com',
+      destination: tourInterest,
+      message: message.trim(),
+    });
+
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSent(true);
-      showToast('Your message has been received! Our trip lead will contact you within 2 hours.', 'success');
       setName('');
       setEmail('');
       setPhone('');
       setMessage('');
-    }, 1000);
+    }, 500);
   };
 
   const handleWhatsApp = () => {
-    window.open(
+    const a = document.createElement('a');
+    a.href =
       settings.whatsappLink ||
-        'https://wa.me/919421709258?text=Hi%20Adventure%20on%20the%20Way!%20I%20want%20to%20book%20a%20trip.',
-      '_blank'
-    );
+      'https://wa.me/919421709258?text=Hi%20Adventure%20On%20The%20Way!%20I%20want%20to%20book%20a%20trip.';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.click();
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] dark:bg-[#111111] py-16 transition-colors">
+    <div className="min-h-screen bg-[#FFF8F0] dark:bg-[#111111] py-12 sm:py-16 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Banner */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#FF6B35]">
-            24x7 Basecamp Support
-          </span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-extrabold uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            Open Now • Open 24 Hours • Haridwar Head Office
+          </div>
           <h1 className="font-poppins font-black text-3xl sm:text-5xl text-zinc-900 dark:text-white">
-            Connect with Our Expedition Captains
+            Om Travels &amp; Adventure On The Way
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Have questions regarding fitness, acclimatization, gear packing, or custom group departures? We are here to guide you.
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+            Visit us at <strong>4, Devpura, Haridwar, Uttarakhand 249401</strong> or call our 24×7 Yatra Desk for Chardham Yatra, Aadi Kailash Om Parvat, Mussoorie, Nainital &amp; all Uttarakhand tour packages.
           </p>
         </div>
 
         {/* Contact Grid: Form + Info Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Form */}
+          {/* Left Column: Enquiry Form Saved to PostgreSQL */}
           <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-sm space-y-6">
             <h2 className="font-poppins font-black text-xl text-zinc-900 dark:text-white">
-              Send an Expedition Inquiry
+              Send a Yatra / Tour Enquiry
             </h2>
 
             {isSent && (
               <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-sm">Inquiry Dispatched Successfully!</h4>
-                  <p>A certified mountain trip coordinator has been notified and will call or message you shortly.</p>
+                  <h4 className="font-bold text-sm">Enquiry Saved to Haridwar Yatra Desk!</h4>
+                  <p>
+                    Our Haridwar coordinator (+91 94217 09258 / +91 86687 40237) has received your enquiry and will call or WhatsApp you shortly.
+                  </p>
                 </div>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-bold text-zinc-700 dark:text-zinc-300">Your Full Name *</label>
+                  <label className="font-bold text-zinc-700 dark:text-zinc-300">
+                    Your Full Name *
+                  </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Ankit Sharma"
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                    placeholder="e.g. Rajeshwar Sharma"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3.5 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-bold text-zinc-700 dark:text-zinc-300">WhatsApp / Mobile Number</label>
+                  <label className="font-bold text-zinc-700 dark:text-zinc-300">
+                    WhatsApp / Mobile Number *
+                  </label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                    placeholder="+91 94217 09258"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3.5 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                    required
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-bold text-zinc-700 dark:text-zinc-300">Email Address *</label>
+                  <label className="font-bold text-zinc-700 dark:text-zinc-300">
+                    Email Address
+                  </label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="adventurer@gmail.com"
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
-                    required
+                    placeholder="yatri@gmail.com"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3.5 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-bold text-zinc-700 dark:text-zinc-300">Tour of Interest</label>
+                  <label className="font-bold text-zinc-700 dark:text-zinc-300">
+                    Select Yatra / Tour Package
+                  </label>
                   <select
                     value={tourInterest}
                     onChange={(e) => setTourInterest(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-zinc-900 dark:text-white focus:outline-none"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3.5 text-zinc-900 dark:text-white focus:outline-none"
                   >
-                    <option value="Spiti Valley Ultimate 4x4 Circuit">Spiti Valley Ultimate 4x4 Circuit</option>
-                    <option value="Leh-Ladakh Royal Enfield Motorcycle Odyssey">Leh-Ladakh Motorcycle Odyssey</option>
-                    <option value="Manali High Altitude & Solang Valley">Manali High Altitude & Solang</option>
-                    <option value="Rishikesh White Water Rapids & Glamping">Rishikesh Rafting & Glamping</option>
-                    <option value="Kashmir Great Lakes Alpine Wilderness">Kashmir Great Lakes Trek</option>
-                    <option value="Kedarkantha Winter Snow Summit Trek">Kedarkantha Snow Trek</option>
-                    <option value="Custom Private Corporate Expedition">Custom Corporate / Group Expedition</option>
+                    {packages.map((p) => (
+                      <option key={p.id} value={p.title}>
+                        {p.title} ({p.duration})
+                      </option>
+                    ))}
+                    <option value="Custom Uttarakhand Tempo Traveller / Innova Booking">
+                      Custom Uttarakhand Tempo Traveller / Innova Booking
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-zinc-700 dark:text-zinc-300">Message / Questions *</label>
+                <label className="font-bold text-zinc-700 dark:text-zinc-300">
+                  Travel Dates, Group Size &amp; Requirements *
+                </label>
                 <textarea
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Tell us your tentative travel dates, group size, or questions about fitness..."
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
+                  placeholder="Share your arrival date at Haridwar, number of Yatris/travelers, and hotel/vehicle preference..."
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3.5 text-zinc-900 dark:text-white focus:outline-none focus:border-[#FF6B35]"
                   required
                 />
               </div>
@@ -156,94 +180,153 @@ export const ContactPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-sm text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 style={{ backgroundColor: settings.accentColor }}
               >
                 <Send className="w-4 h-4" />
-                <span>{isSubmitting ? 'Sending Request...' : 'Send Inquiry Message'}</span>
+                <span>
+                  {isSubmitting ? 'Submitting to Database...' : 'Submit Yatra Enquiry'}
+                </span>
               </button>
             </form>
           </div>
 
-          {/* Right Column: Contact Details & Google Map */}
+          {/* Right Column: Real Haridwar Contact Details & Google Map */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 text-xs">
-              <h3 className="font-poppins font-black text-lg text-zinc-900 dark:text-white">
-                Base Operations HQ
-              </h3>
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 text-xs sm:text-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="font-poppins font-black text-lg text-zinc-900 dark:text-white">
+                  Haridwar Head Office
+                </h3>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold">
+                  Open 24 Hours
+                </span>
+              </div>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#0B3D2E]/10 text-[#0B3D2E] dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4" />
+                  <div className="w-10 h-10 rounded-xl bg-[#0B3D2E]/10 text-[#0B3D2E] dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-zinc-900 dark:text-white block">HQ Address</span>
-                    <p className="text-zinc-500 mt-0.5">{settings.address}</p>
+                    <span className="font-bold text-zinc-900 dark:text-white block">
+                      Office Address
+                    </span>
+                    <p className="text-zinc-600 dark:text-zinc-400 mt-0.5">
+                      4, Devpura, Haridwar, Uttarakhand 249401, India
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#FF6B35]/10 text-[#FF6B35] flex items-center justify-center shrink-0">
-                    <Phone className="w-4 h-4" />
+                  <div className="w-10 h-10 rounded-xl bg-[#FF6B35]/10 text-[#FF6B35] flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5" />
                   </div>
-                  <div>
-                    <span className="font-bold text-zinc-900 dark:text-white block">Direct Phone</span>
-                    <a href={`tel:${settings.contactPhone}`} className="text-zinc-500 hover:text-[#FF6B35] transition">
-                      {settings.contactPhone}
+                  <div className="space-y-1">
+                    <span className="font-bold text-zinc-900 dark:text-white block">
+                      24×7 Booking &amp; WhatsApp Numbers
+                    </span>
+                    <a
+                      href="tel:+919421709258"
+                      className="block font-bold text-[#0B3D2E] dark:text-emerald-400 hover:underline"
+                    >
+                      📞 +91 94217 09258 (Primary / WhatsApp)
+                    </a>
+                    <a
+                      href="tel:+918668740237"
+                      className="block font-bold text-[#FF6B35] hover:underline"
+                    >
+                      📞 +91 86687 40237 (Secondary Desk)
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
-                    <Mail className="w-4 h-4" />
+                  <div className="w-10 h-10 rounded-xl bg-pink-500/10 text-pink-600 flex items-center justify-center shrink-0">
+                    <Instagram className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-zinc-900 dark:text-white block">Official Email</span>
-                    <a href={`mailto:${settings.contactEmail}`} className="text-zinc-500 hover:text-sky-500 transition">
-                      {settings.contactEmail}
+                    <span className="font-bold text-zinc-900 dark:text-white block">
+                      Official Instagram (71,175 Followers)
+                    </span>
+                    <a
+                      href="https://instagram.com/adventure_on_the_way"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-pink-600 dark:text-pink-400 font-semibold hover:underline"
+                    >
+                      @adventure_on_the_way • 71.1K Followers
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0">
-                    <Clock className="w-4 h-4" />
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                    <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-zinc-900 dark:text-white block">Operational Hours</span>
-                    <p className="text-zinc-500 mt-0.5">Monday – Sunday: 7:00 AM – 10:00 PM IST</p>
-                    <p className="text-zinc-400 text-[10px]">Active field expeditions have 24/7 radio support</p>
+                    <span className="font-bold text-zinc-900 dark:text-white block">
+                      Official Email &amp; UPI ID
+                    </span>
+                    <a
+                      href="mailto:hello@adventureontheway.com"
+                      className="text-zinc-600 dark:text-zinc-400 hover:text-sky-500 transition block"
+                    >
+                      hello@adventureontheway.com
+                    </a>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      UPI ID: 9421709258@upi
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-zinc-900 dark:text-white block">
+                      Timing
+                    </span>
+                    <p className="text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+                      Open Now • Open 24 Hours (Monday – Sunday)
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={handleWhatsApp}
-                  className="w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-[#20ba59] transition"
+                  className="py-3 rounded-xl bg-[#25D366] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-[#20ba59] transition cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Chat Immediately on WhatsApp</span>
+                  <span>WhatsApp +91 94217 09258</span>
                 </button>
+                <a
+                  href="tel:+918668740237"
+                  className="py-3 rounded-xl bg-[#FF6B35] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-[#e85a25] transition"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Call +91 86687 40237</span>
+                </a>
               </div>
             </div>
 
-            {/* Google Map Embed Container */}
+            {/* Real Google Map Embed for 4, Devpura, Haridwar */}
             <div className="rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm bg-zinc-900 h-64 relative">
               <iframe
-                title="Adventure on the Way Basecamp Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13540.354146059288!2d77.178822!3d32.2396325!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39048708107f9c2d%3A0x633516550710ec1f!2sMall%20Rd%2C%20Manali%2C%20Himachal%20Pradesh%20175131!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                title="Om Travels & Adventure On The Way - 4, Devpura, Haridwar"
+                src="https://www.google.com/maps?q=4,+Devpura,+Haridwar,+Uttarakhand+249401&output=embed"
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: 'grayscale(0.2)' }}
+                className="border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
-              <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
-                📍 Manali Base Station & Briefing Center
+              <div className="absolute bottom-2 left-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
+                📍 4, Devpura, Haridwar, Uttarakhand 249401
               </div>
             </div>
           </div>

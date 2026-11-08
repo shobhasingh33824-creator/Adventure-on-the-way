@@ -38,7 +38,7 @@ export const destinations = pgTable('destinations', {
   title: text('title').notNull(),
   slug: text('slug').notNull(),
   location: text('location').notNull(),
-  state: text('state').default('Himachal Pradesh').notNull(),
+  state: text('state').default('Uttarakhand').notNull(),
   category: text('category').notNull(),
   price: integer('price').notNull(),
   discountPrice: integer('discount_price').notNull(),
@@ -62,7 +62,7 @@ export const destinations = pgTable('destinations', {
   mapCoordinates: jsonb('map_coordinates')
     .$type<{ lat: number; lng: number }>()
     .notNull(),
-  pickupPoint: text('pickup_point').default('Delhi / Chandigarh').notNull(),
+  pickupPoint: text('pickup_point').default('Haridwar / Rishikesh').notNull(),
   nextAvailableDates: jsonb('next_available_dates')
     .$type<string[]>()
     .default([])
@@ -97,6 +97,7 @@ export const bookings = pgTable('bookings', {
   paymentMethod: text('payment_method').notNull(),
   paymentStatus: text('payment_status').notNull(),
   utrNumber: text('utr_number'),
+  paymentScreenshot: text('payment_screenshot').default(''),
   status: text('status').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -114,19 +115,31 @@ export const coupons = pgTable('coupons', {
 export const siteSettings = pgTable('site_settings', {
   id: integer('id').primaryKey().default(1),
   brandName: text('brand_name').notNull(),
+  shortName: text('short_name').default('Adventure On The Way').notNull(),
   tagline: text('tagline').notNull(),
+  aboutText: text('about_text')
+    .default(
+      'Adventure On The Way is one of the best travel companies to provide best tour packages of Uttarakhand - Chardham Yatra, Aadi Kailash Om Parvat Yatra, Mussoorie, Nainital and all Uttarakhand tour packages.'
+    )
+    .notNull(),
   primaryColor: text('primary_color').notNull(),
   accentColor: text('accent_color').notNull(),
   heroBannerUrl: text('hero_banner_url').notNull(),
+  logoUrl: text('logo_url').default('').notNull(),
   heroHeadline: text('hero_headline').notNull(),
   contactEmail: text('contact_email').notNull(),
   contactPhone: text('contact_phone').notNull(),
+  secondaryPhone: text('secondary_phone').default('+91 86687 40237').notNull(),
   whatsappNumber: text('whatsapp_number').notNull(),
   whatsappLink: text('whatsapp_link').notNull(),
   callLink: text('call_link').notNull(),
+  secondaryCallLink: text('secondary_call_link').default('tel:+918668740237').notNull(),
   officeAddress: text('office_address').notNull(),
   upiId: text('upi_id').notNull(),
   instagramUrl: text('instagram_url').notNull(),
+  instagramHandle: text('instagram_handle').default('@adventure_on_the_way').notNull(),
+  instagramFollowers: text('instagram_followers').default('71,175 Followers').notNull(),
+  openHours: text('open_hours').default('Open 24 Hours').notNull(),
   facebookUrl: text('facebook_url').notNull(),
   youtubeUrl: text('youtube_url').notNull(),
 });
@@ -138,6 +151,31 @@ export const notifications = pgTable('notifications', {
   message: text('message').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   read: boolean('read').default(false).notNull(),
+});
+
+export const gallery = pgTable('gallery', {
+  id: text('id').primaryKey(),
+  url: text('url').notNull(),
+  title: text('title').notNull(),
+  tourId: text('tour_id').default(''),
+  tourName: text('tour_name').default(''),
+  category: text('category').default('tour').notNull(),
+  sizeKb: integer('size_kb').default(240).notNull(),
+  width: integer('width').default(1200).notNull(),
+  height: integer('height').default(800).notNull(),
+  uploadedBy: text('uploaded_by').default('admin@adventureontheway.com').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const enquiries = pgTable('enquiries', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  phone: text('phone').notNull(),
+  email: text('email').notNull(),
+  destination: text('destination').notNull(),
+  message: text('message').notNull(),
+  status: text('status').default('New').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

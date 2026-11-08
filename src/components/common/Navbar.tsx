@@ -26,64 +26,138 @@ export const Logo: React.FC<{ className?: string; isLight?: boolean }> = ({
   const { settings } = useApp();
 
   return (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Mountain + Road Custom SVG Graphic */}
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md relative overflow-hidden transition-transform duration-300 hover:scale-105 shrink-0"
-        style={{
-          background: `linear-gradient(135deg, ${settings.primaryColor} 0%, #173f32 100%)`,
-        }}
-      >
-        <svg
-          viewBox="0 0 40 40"
-          className="w-7 h-7 text-[#FFF8F0]"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Mountain Peaks */}
-          <path
-            d="M8 28L17 12L24 23L27 18L33 28H8Z"
-            fill="currentColor"
-            fillOpacity="0.85"
+    <div className={`flex items-center gap-3 select-none ${className}`}>
+      {/* Circular Brown Emblem Logo from Screenshot (Mountains + Adventure Jeep + Dashed Road) */}
+      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden border-2 border-white dark:border-amber-200/80 ring-2 ring-[#3B2314] bg-[#3B2314] transition-transform duration-300 hover:scale-105 shrink-0">
+        {settings.logoUrl ? (
+          <img
+            src={settings.logoUrl}
+            alt={settings.brandName}
+            className="w-full h-full object-cover rounded-full"
           />
-          {/* Snowcaps */}
-          <path
-            d="M17 12L19.5 16.5L17 18L14.5 16.5L17 12Z"
-            fill="#FFFFFF"
-          />
-          <path
-            d="M27 18L29 21.5L27 22.5L25 21.5L27 18Z"
-            fill="#FFFFFF"
-          />
-          {/* Winding Road through mountains with Sunset Orange accent */}
-          <path
-            d="M20 23C20 23 18.5 29 11 36H29C23 31 22 25 20 23Z"
-            fill="#FF6B35"
-          />
-          {/* Center Road Dash */}
-          <path
-            d="M20 26L19 29M20 32L19 35"
-            stroke="#FFF8F0"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        ) : (
+          <svg
+            viewBox="0 0 120 120"
+            className="w-full h-full"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Outer Dark Brown Circle & White Inner Ring */}
+            <circle cx="60" cy="60" r="58" fill="#3B2314" stroke="#FFFFFF" strokeWidth="2.5" />
+            <circle cx="60" cy="60" r="52" stroke="#D7B377" strokeWidth="1" strokeOpacity="0.6" />
+
+            {/* Top Arched Text: TOURS & TRAVELS */}
+            <path id="topArc" d="M 22,54 A 38,38 0 1,1 98,54" fill="none" />
+            <text
+              fill="#FFF8F0"
+              fontSize="7.5"
+              fontWeight="800"
+              letterSpacing="1.6"
+              textAnchor="middle"
+            >
+              <textPath href="#topArc" startOffset="50%">
+                TOURS &amp; TRAVELS
+              </textPath>
+            </text>
+
+            {/* Snow-Capped Himalayan Mountains */}
+            <polygon points="16,72 42,32 64,72" fill="#5A3821" stroke="#FFFFFF" strokeWidth="1.5" />
+            <polygon points="42,32 50,45 44,43 42,48 38,43 34,45" fill="#FFFFFF" />
+
+            <polygon points="44,72 68,28 96,72" fill="#4A2C18" stroke="#FFFFFF" strokeWidth="1.8" />
+            <polygon points="68,28 78,44 71,41 68,47 64,41 58,44" fill="#FFFFFF" />
+
+            <polygon points="74,72 92,42 106,72" fill="#5A3821" stroke="#FFFFFF" strokeWidth="1.4" />
+            <polygon points="92,42 97,51 92,49 87,51" fill="#FFFFFF" />
+
+            {/* Curved Dashed Mountain Road */}
+            <path
+              d="M 12 73 Q 60 85 108 73"
+              stroke="#23140B"
+              strokeWidth="12"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 12 73 Q 60 85 108 73"
+              stroke="#FFFFFF"
+              strokeWidth="1.4"
+              strokeDasharray="4 4"
+              strokeLinecap="round"
+            />
+
+            {/* Teal/Green Adventure Jeep with Roof Luggage */}
+            <g transform="translate(43, 52)">
+              {/* Roof luggage rack */}
+              <rect x="6" y="0" width="20" height="5" rx="1.5" fill="#FF6B35" stroke="#FFF" strokeWidth="0.8" />
+              <rect x="11" y="-3" width="10" height="3.5" rx="1" fill="#FBBF24" />
+              {/* Jeep cabin & body */}
+              <path
+                d="M4 12 L8 5 L26 5 L30 12 L34 13 L34 20 L2 20 L2 12 Z"
+                fill="#10B981"
+                stroke="#FFFFFF"
+                strokeWidth="1.2"
+              />
+              {/* Windshield & windows */}
+              <polygon points="9,7 16,7 16,12 6,12" fill="#E0F2FE" />
+              <rect x="18" y="7" width="8" height="5" fill="#E0F2FE" />
+              {/* Headlights */}
+              <circle cx="33" cy="15" r="1.8" fill="#FEF08A" />
+              {/* Wheels */}
+              <circle cx="9" cy="20" r="4" fill="#111111" stroke="#FFFFFF" strokeWidth="1.2" />
+              <circle cx="26" cy="20" r="4" fill="#111111" stroke="#FFFFFF" strokeWidth="1.2" />
+            </g>
+
+            {/* Bottom Emblem Banner: ADVENTURE ON THE WAY */}
+            <text
+              x="60"
+              y="95"
+              fill="#FFFFFF"
+              fontSize="11"
+              fontWeight="900"
+              fontFamily="Poppins, sans-serif"
+              letterSpacing="0.8"
+              textAnchor="middle"
+            >
+              ADVENTURE
+            </text>
+            <text
+              x="60"
+              y="104"
+              fill="#FBBF24"
+              fontSize="6.5"
+              fontWeight="800"
+              letterSpacing="1.2"
+              textAnchor="middle"
+            >
+              ★ ON THE WAY ★
+            </text>
+          </svg>
+        )}
       </div>
 
       <div className="flex flex-col">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-[#FF6B35]">
+            OM TRAVELS &amp;
+          </span>
+          <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[9px] font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Open 24 Hours
+          </span>
+        </div>
         <span
-          className={`font-poppins font-extrabold text-lg sm:text-xl tracking-tight leading-none ${
+          className={`font-poppins font-extrabold text-sm sm:text-lg tracking-tight leading-tight ${
             isLight ? 'text-white' : 'text-zinc-900 dark:text-white'
           }`}
         >
-          {settings.brandName}
+          Adventure On The Way
         </span>
         <span
-          className={`text-[10px] sm:text-[11px] font-medium tracking-wider uppercase mt-0.5 ${
-            isLight ? 'text-zinc-200' : 'text-[#FF6B35] font-semibold'
+          className={`text-[9px] sm:text-[10px] font-medium tracking-wide ${
+            isLight ? 'text-zinc-300' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
-          Live The Adventure
+          4, Devpura, Haridwar • Uttarakhand
         </span>
       </div>
     </div>
@@ -139,7 +213,45 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#FFF8F0]/90 dark:bg-[#111111]/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
+    <header className="sticky top-0 z-40 w-full bg-[#FFF8F0]/95 dark:bg-[#111111]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
+      {/* Top Haridwar HQ Direct Contact Strip */}
+      <div className="bg-[#0B3D2E] text-white text-[11px] py-1.5 px-4 border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              Open Now • {settings.openHours || 'Open 24 Hours'}
+            </span>
+            <span className="hidden md:inline text-white/40">|</span>
+            <span className="hidden md:inline text-zinc-200">
+              📍 {settings.address || '4, Devpura, Haridwar, Uttarakhand 249401'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4 font-semibold">
+            <a
+              href={settings.callLink || 'tel:+919421709258'}
+              className="hover:text-[#FF6B35] transition"
+            >
+              📞 +91 94217 09258
+            </a>
+            <a
+              href={settings.secondaryCallLink || 'tel:+918668740237'}
+              className="hover:text-[#FF6B35] transition"
+            >
+              📞 +91 86687 40237
+            </a>
+            <a
+              href={settings.instagramUrl || 'https://instagram.com/adventure_on_the_way'}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline-flex items-center gap-1 text-amber-300 hover:underline"
+            >
+              📸 @adventure_on_the_way ({settings.instagramFollowers || '71,175 Followers'})
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <div

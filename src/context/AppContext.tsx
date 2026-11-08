@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../lib/firebase';
+import { syncOfflineDraftsToDatabase } from '../lib/imageUpload';
 import {
   TourPackage,
   Booking,
@@ -11,6 +12,8 @@ import {
   Language,
   BookingStatus,
   AdminNotification,
+  GalleryItem,
+  Enquiry,
 } from '../types';
 import {
   initialPackages,
@@ -19,6 +22,8 @@ import {
   initialUsers,
   initialBookings,
   initialNotifications,
+  initialGallery,
+  initialEnquiries,
 } from '../data/initialData';
 
 export interface ToastMessage {
@@ -58,13 +63,24 @@ interface AppContextType {
 
   // Packages
   packages: TourPackage[];
-  addPackage: (pkg: Omit<TourPackage, 'id'>) => void;
+  addPackage: (pkg: Omit<TourPackage, 'id'>) => TourPackage;
   updatePackage: (id: string, pkg: Partial<TourPackage>) => void;
   deletePackage: (id: string) => void;
   duplicatePackage: (id: string) => void;
   togglePackageStatus: (id: string) => void;
   selectedPackage: TourPackage | null;
   setSelectedPackage: (pkg: TourPackage | null) => void;
+
+  // Gallery Manager
+  gallery: GalleryItem[];
+  addGalleryItems: (items: GalleryItem[]) => void;
+  deleteGalleryItem: (id: string) => void;
+  setGalleryCoverForTour: (tourId: string, imageUrl: string) => void;
+
+  // Enquiries
+  enquiries: Enquiry[];
+  addEnquiry: (data: Omit<Enquiry, 'id' | 'createdAt' | 'status'>) => void;
+  updateEnquiryStatus: (id: string, status: Enquiry['status']) => void;
 
   // Wishlist
   wishlist: string[];
@@ -118,17 +134,35 @@ const translations: Record<string, { en: string; hi: string }> = {
   about: { en: 'About Us', hi: 'हमारे बारे में' },
   contact: { en: 'Contact', hi: 'संपर्क करें' },
   bookNow: { en: 'Book Now', hi: 'अभी बुक करें' },
-  heroTitle: { en: 'Your Next Adventure Starts Here', hi: 'आपका अगला रोमांच यहाँ शुरू होता है' },
-  heroSubtitle: { en: "Don't Just Travel, Live The Adventure", hi: 'सिर्फ यात्रा मत करो, रोमांच को जियो' },
-  searchDestinationPlaceholder: { en: 'Where to? (e.g. Manali, Spiti, Ladakh)', hi: 'कहाँ जाना है? (जैसे मनाली, स्पीति)' },
+  heroTitle: {
+    en: 'Haridwar se Himalaya Tak – Live The Adventure',
+    hi: 'हरिद्वार से हिमालय तक – रोमांच को जियो',
+  },
+  heroSubtitle: {
+    en: "Don't Just Travel, Live The Adventure - Haridwar se Himalaya Tak",
+    hi: 'सिर्फ यात्रा मत करो, रोमांच को जियो - हरिद्वार से हिमालय तक',
+  },
+  searchDestinationPlaceholder: {
+    en: 'Where to? (Chardham, Kedarnath, Aadi Kailash, Auli, Mussoorie)',
+    hi: 'कहाँ जाना है? (चारधाम, केदारनाथ, आदि कैलाश, औली)',
+  },
   date: { en: 'Date', hi: 'तारीख' },
   travellers: { en: 'Travellers', hi: 'यात्री' },
-  searchTours: { en: 'Search Adventures', hi: 'रोमांच खोजें' },
-  trendingDestinations: { en: 'Trending Expeditions', hi: 'ट्रेंडिंग यात्राएं' },
-  whyChooseUs: { en: 'Why Adventure on the Way', hi: 'हमारा ही चयन क्यों?' },
-  featuredPackages: { en: 'Handcrafted Tour Packages', hi: 'हैंडक्राफ़्टेड टूर पैकेज' },
-  storiesTitle: { en: 'Expedition Stories & Guides', hi: 'यात्रा वृतांत और अनुभव' },
-  reviewsTitle: { en: 'Stories From Real Adventurers', hi: 'असली साहसी यात्रियों की समीक्षाएं' },
+  searchTours: { en: 'Search Yatra & Tours', hi: 'यात्रा खोजें' },
+  trendingDestinations: {
+    en: 'Most Popular Uttarakhand Yatras & Tours',
+    hi: 'सबसे लोकप्रिय उत्तराखंड यात्राएं',
+  },
+  whyChooseUs: {
+    en: 'Why Choose Om Travels & Adventure On The Way',
+    hi: 'ओम ट्रैवल्स और एडवेंचर ऑन द वे क्यों चुनें?',
+  },
+  featuredPackages: {
+    en: 'Uttarakhand Chardham & Himalayan Packages',
+    hi: 'उत्तराखंड चारधाम और हिमालय पैकेज',
+  },
+  storiesTitle: { en: 'Yatra Guides & Travel Stories', hi: 'यात्रा गाइड और अनुभव' },
+  reviewsTitle: { en: 'Verified Yatri & Traveler Reviews', hi: 'सत्यापित यात्रियों की समीक्षाएं' },
   myBookings: { en: 'My Bookings', hi: 'मेरी बुकिंग्स' },
   adminPanel: { en: 'Admin Portal', hi: 'एडमिन पोर्टल' },
   loginSignup: { en: 'Login / Sign Up', hi: 'लॉग इन / साइन अप' },
@@ -136,7 +170,6 @@ const translations: Record<string, { en: string; hi: string }> = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Store Firebase ID Token strictly in memory (never in localStorage)
   const authTokenRef = useRef<string | null>(null);
 
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -152,18 +185,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     travellers: 2,
   });
 
-  const [packages, setPackages] = useState<TourPackage[]>(
-    initialPackages.map((p) => ({
-      ...p,
-      isActive: true,
-      isBestSeller: p.rating >= 4.9,
-    }))
-  );
+  const [packages, setPackages] = useState<TourPackage[]>(initialPackages);
   const [selectedPackage, setSelectedPackage] = useState<TourPackage | null>(null);
   const [bookingModalPackage, setBookingModalPackage] = useState<TourPackage | null>(null);
+  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery);
+  const [enquiries, setEnquiries] = useState<Enquiry[]>(initialEnquiries);
   const [wishlist, setWishlist] = useState<string[]>([
-    'spiti-valley-expedition',
-    'ladakh-bike-odyssey',
+    'chardham-yatra-uttarakhand',
+    'aadi-kailash-om-parvat-yatra',
   ]);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -172,6 +201,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>(initialCoupons);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    const id = Date.now().toString() + Math.random().toString().slice(2, 6);
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      removeToast(id);
+    }, 4500);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const getAuthHeaders = async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = {
@@ -187,44 +228,57 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return headers;
   };
 
-  // Load application state from PostgreSQL database on mount
-  useEffect(() => {
-    let active = true;
-    async function fetchDatabaseState() {
-      try {
-        const res = await fetch('/api/state');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!active) return;
-        if (Array.isArray(data.packages) && data.packages.length > 0) {
-          setPackages(data.packages);
-        }
-        if (Array.isArray(data.bookings)) {
-          setBookings(data.bookings);
-        }
-        if (Array.isArray(data.users) && data.users.length > 0) {
-          setAllUsers(data.users);
-        }
-        if (Array.isArray(data.coupons) && data.coupons.length > 0) {
-          setCoupons(data.coupons);
-        }
-        if (data.settings) {
-          setSettings(data.settings);
-        }
-        if (Array.isArray(data.notifications)) {
-          setNotifications(data.notifications);
-        }
-      } catch (err) {
-        console.error('Error fetching state from API:', err);
+  const fetchDatabaseState = async () => {
+    try {
+      const res = await fetch('/api/state');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data.packages) && data.packages.length > 0) {
+        setPackages(data.packages);
       }
+      if (Array.isArray(data.bookings)) {
+        setBookings(data.bookings);
+      }
+      if (Array.isArray(data.users) && data.users.length > 0) {
+        setAllUsers(data.users);
+      }
+      if (Array.isArray(data.coupons) && data.coupons.length > 0) {
+        setCoupons(data.coupons);
+      }
+      if (data.settings) {
+        setSettings(data.settings);
+      }
+      if (Array.isArray(data.notifications)) {
+        setNotifications(data.notifications);
+      }
+      if (Array.isArray(data.gallery)) {
+        setGallery(data.gallery);
+      }
+      if (Array.isArray(data.enquiries)) {
+        setEnquiries(data.enquiries);
+      }
+    } catch (err) {
+      console.error('Error fetching state from API:', err);
     }
+  };
+
+  useEffect(() => {
     fetchDatabaseState();
-    return () => {
-      active = false;
+
+    const handleOnline = async () => {
+      const synced = await syncOfflineDraftsToDatabase();
+      if (synced > 0) {
+        showToast(
+          `Back online! Synced ${synced} offline draft photo(s)/tour(s) to database.`,
+          'success'
+        );
+        fetchDatabaseState();
+      }
     };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
   }, []);
 
-  // Listen to Firebase Auth state changes and synchronize user profile in PostgreSQL
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
@@ -268,7 +322,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => unsubscribe();
   }, []);
 
-  // Apply dark mode to HTML
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -277,7 +330,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [darkMode]);
 
-  // Apply custom primary color to CSS variables
   useEffect(() => {
     document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
     document.documentElement.style.setProperty('--accent-color', settings.accentColor);
@@ -302,18 +354,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return `₹${amountInInr.toLocaleString('en-IN')}`;
   };
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    const id = Date.now().toString() + Math.random().toString().slice(2, 6);
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      removeToast(id);
-    }, 4000);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
   const updateSettings = (newSettings: Partial<SiteSettings>) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
@@ -322,7 +362,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated),
     }).catch((err) => console.error('Failed to persist settings:', err));
-    showToast('Theme & Brand settings saved to database!', 'success');
+    showToast('Brand & Theme settings saved to database!', 'success');
   };
 
   const handleHeroSearch = (query: SearchQuery) => {
@@ -331,8 +371,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Packages management persisted to PostgreSQL
-  const addPackage = (newPkgData: Omit<TourPackage, 'id'>) => {
+  const addPackage = (newPkgData: Omit<TourPackage, 'id'>): TourPackage => {
     const id =
       newPkgData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
       '-' +
@@ -340,7 +379,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const createdPackage: TourPackage = {
       ...newPkgData,
       id,
-      isActive: true,
+      isActive: newPkgData.isActive !== false,
       isBestSeller: newPkgData.isBestSeller ?? false,
     };
     setPackages((prev) => [createdPackage, ...prev]);
@@ -349,10 +388,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(createdPackage),
     }).catch((err) => console.error('Failed to persist package:', err));
-    showToast(
-      `Package "${createdPackage.title}" saved to PostgreSQL & published live!`,
-      'success'
-    );
+    showToast('Tour Published Successfully ✅', 'success');
+    return createdPackage;
   };
 
   const updatePackage = (id: string, updatedFields: Partial<TourPackage>) => {
@@ -370,7 +407,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return pkg;
       })
     );
-    showToast('Package updated in database!', 'success');
+    showToast('Tour package updated in database!', 'success');
   };
 
   const deletePackage = (id: string) => {
@@ -378,7 +415,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetch(`/api/destinations/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     }).catch((err) => console.error('Failed to delete package from DB:', err));
-    showToast('Package removed from database.', 'info');
+    showToast('Tour package removed from database.', 'info');
   };
 
   const duplicatePackage = (id: string) => {
@@ -420,6 +457,92 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return pkg;
       })
     );
+  };
+
+  // Gallery Management
+  const addGalleryItems = (items: GalleryItem[]) => {
+    setGallery((prev) => [...items, ...prev]);
+  };
+
+  const deleteGalleryItem = (id: string) => {
+    const target = gallery.find((g) => g.id === id);
+    setGallery((prev) => prev.filter((g) => g.id !== id));
+    fetch(`/api/gallery/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }).catch((err) => console.error('Failed to delete gallery item:', err));
+
+    // Also remove from associated tour's images[] if present
+    if (target?.url) {
+      setPackages((prev) =>
+        prev.map((pkg) => {
+          if (pkg.images.includes(target.url) && pkg.images.length > 1) {
+            const updatedPkg = {
+              ...pkg,
+              images: pkg.images.filter((img) => img !== target.url),
+            };
+            fetch(`/api/destinations/${encodeURIComponent(pkg.id)}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updatedPkg),
+            }).catch(() => {});
+            return updatedPkg;
+          }
+          return pkg;
+        })
+      );
+    }
+    showToast('Photo removed from Gallery & Storage.', 'info');
+  };
+
+  const setGalleryCoverForTour = (tourId: string, imageUrl: string) => {
+    setPackages((prev) =>
+      prev.map((pkg) => {
+        if (pkg.id === tourId) {
+          const filtered = pkg.images.filter((img) => img !== imageUrl);
+          const updatedPkg = {
+            ...pkg,
+            images: [imageUrl, ...filtered],
+          };
+          fetch(`/api/destinations/${encodeURIComponent(pkg.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedPkg),
+          }).catch((err) => console.error('Failed to set tour cover:', err));
+          showToast(`Set as main Cover Photo for "${pkg.title}"!`, 'success');
+          return updatedPkg;
+        }
+        return pkg;
+      })
+    );
+  };
+
+  // Enquiries
+  const addEnquiry = (data: Omit<Enquiry, 'id' | 'createdAt' | 'status'>) => {
+    const newEnq: Enquiry = {
+      ...data,
+      id: `enq-${Date.now()}`,
+      status: 'New',
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    setEnquiries((prev) => [newEnq, ...prev]);
+    fetch('/api/enquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEnq),
+    }).catch((err) => console.error('Failed to save enquiry:', err));
+    showToast('Enquiry sent to Om Travels Haridwar HQ! We will call you shortly.', 'success');
+  };
+
+  const updateEnquiryStatus = (id: string, status: Enquiry['status']) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status } : e))
+    );
+    fetch(`/api/enquiries/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    }).catch((err) => console.error('Failed to update enquiry status:', err));
+    showToast(`Enquiry marked as ${status}`, 'info');
   };
 
   const toggleWishlist = async (packageId: string) => {
@@ -465,7 +588,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       body: JSON.stringify(newBooking),
     }).catch((err) => console.error('Failed to persist booking:', err));
 
-    // Deduct available seats & persist destination seat count
     setPackages((prev) =>
       prev.map((pkg) => {
         if (pkg.id === bookingData.packageId) {
@@ -495,7 +617,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setNotifications((prev) => [newNotif, ...prev]);
 
-    showToast(`Booking ${newBooking.id} confirmed & stored in database!`, 'success');
+    showToast(`Booking ${newBooking.id} confirmed & saved to database!`, 'success');
     return newBooking;
   };
 
@@ -527,7 +649,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`UPI payment verified for booking ${id}!`, 'success');
   };
 
-  // Real Firebase Google Sign-In via signInWithPopup
   const loginWithGoogle = async () => {
     try {
       const credential = await signInWithPopup(auth, googleAuthProvider);
@@ -575,17 +696,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ) {
       const adminUser: User = {
         id: 'usr-admin-1',
-        name: 'Adventure Commander (Admin)',
+        name: 'Om Travels Admin (Haridwar HQ)',
         email: 'admin@adventureontheway.com',
         phone: '+91 94217 09258',
-        avatar:
-          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop',
+        avatar: '/assets/aistudio/Screenshot_20261108-104735_f720548e.png',
         role: 'admin',
-        createdAt: '2026-01-01',
+        createdAt: '2025-01-01',
       };
       setCurrentUser(adminUser);
       setAuthModalOpen(false);
-      showToast('Welcome, Administrator! Launching Super Admin Control Center.', 'success');
+      showToast('Welcome, Om Travels Admin! Launching Haridwar HQ Control Center.', 'success');
       setActiveTab('admin');
       return true;
     }
@@ -623,7 +743,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const demoUser = allUsers.find((u) => u.role === 'user') || initialUsers[1];
     setCurrentUser(demoUser);
     setAuthModalOpen(false);
-    showToast(`Logged in as Traveler: ${demoUser.name}`, 'success');
+    showToast(`Logged in as Yatri: ${demoUser.name}`, 'success');
   };
 
   const loginAsAdmin = () => {
@@ -767,6 +887,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         togglePackageStatus,
         selectedPackage,
         setSelectedPackage,
+        gallery,
+        addGalleryItems,
+        deleteGalleryItem,
+        setGalleryCoverForTour,
+        enquiries,
+        addEnquiry,
+        updateEnquiryStatus,
         wishlist,
         toggleWishlist,
         isWishlisted,

@@ -1,82 +1,161 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Compass, ShieldCheck, Heart, Users, Award, Mountain, ArrowRight } from 'lucide-react';
+import {
+  ShieldCheck,
+  Heart,
+  Award,
+  Mountain,
+  ArrowRight,
+  MapPin,
+  Phone,
+  Clock,
+  Instagram,
+  CheckCircle2,
+} from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   const { settings, setActiveTab } = useApp();
 
-  const leaders = [
-    {
-      name: 'Col. Ranjit Singh (Retd.)',
-      role: 'Head of High-Altitude Safety & Evacuation',
-      exp: '28 Years High Altitude Experience',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400',
-    },
-    {
-      name: 'Pema Dolkar',
-      role: 'Chief Mountaineering Lead (HMI Darjeeling Gold Medalist)',
-      exp: 'Summited 14+ Himalayan Peaks',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400',
-    },
-    {
-      name: 'Samarth Rawat',
-      role: 'Director of Motorcycle Expeditions',
-      exp: '50+ Leh-Manali & Spiti Circuits',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400',
-    },
+  const highlights = [
+    'Chardham Yatra (Yamunotri, Gangotri, Kedarnath, Badrinath) Specialists',
+    'Aadi Kailash & Om Parvat Yatra Inner-Line Permit & Kumaon Fleet',
+    'Mussoorie, Nainital, Auli, Chopta, Valley of Flowers & Corbett Packages',
+    '24x7 On-Ground Support Office at 4, Devpura, Haridwar (Near Railway Station)',
+    '71,175+ Verified Followers Community on Instagram (@adventure_on_the_way)',
+    'Verified Tempo Travellers, Innova Crysta, Helicopter Assistance & Deluxe Camps',
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] dark:bg-[#111111] py-16 transition-colors">
+    <div className="min-h-screen bg-[#FFF8F0] dark:bg-[#111111] py-14 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] text-xs font-bold uppercase tracking-wider">
             <Mountain className="w-4 h-4" />
-            Our Mission & DNA
+            Haridwar's Most Trusted Himalayan Tour Operator
           </div>
           <h1 className="font-poppins font-black text-3xl sm:text-5xl text-zinc-900 dark:text-white">
-            Born in the High Himalayas. Built for Real Explorers.
+            Om Travels & Adventure On The Way
           </h1>
           <p className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed font-medium">
-            "{settings.tagline}" is more than a slogan. It is a commitment that every trek, bike pass, and camp night will push your horizons while preserving nature.
+            "{settings.tagline}"
           </p>
         </div>
 
         {/* Narrative & Visual Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-4 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
-            <h3 className="font-poppins font-bold text-xl text-zinc-900 dark:text-white">
-              Why We Started Adventure on the Way
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="space-y-5 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Open 24 Hours • Headquartered in Haridwar, Uttarakhand</span>
+            </div>
+
+            <h3 className="font-poppins font-bold text-2xl text-zinc-900 dark:text-white">
+              About Adventure On The Way
             </h3>
-            <p>
-              In 2018, our founders—a group of certified mountaineering instructors and adventure bikers—realized that commercial tourism had watered down the wilderness experience. Large tour aggregators packed 50 people into buses, cut safety corners on high passes, and left plastic behind.
+
+            <p className="text-sm leading-relaxed">
+              {settings.aboutText ||
+                'Adventure On The Way is one of the best travel companies to provide best tour packages of Uttarakhand - Chardham Yatra, Aadi Kailash Om Parvat Yatra, Mussoorie, Nainital and all Uttarakhand tour packages.'}
             </p>
-            <p>
-              We established <strong>{settings.brandName}</strong> with a strict charter: small cohorts (max 14-16 adventurers), genuine IMF certified guides, top-tier four-season mountain equipment, satellite emergency backups, and an unyielding <em>Leave No Trace</em> sustainability pledge.
-            </p>
-            <div className="grid grid-cols-2 gap-4 pt-4">
+
+            <div className="space-y-2.5 pt-2">
+              {highlights.map((item, idx) => (
+                <div key={idx} className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-[#FF6B35] shrink-0 mt-0.5" />
+                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 pt-4">
               <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                <span className="font-poppins font-black text-2xl text-[#FF6B35]">15,000+</span>
-                <p className="text-xs text-zinc-400 font-semibold mt-1">Adventurers Guided</p>
+                <span className="font-poppins font-black text-xl sm:text-2xl text-[#FF6B35]">
+                  71.1K+
+                </span>
+                <p className="text-[11px] text-zinc-400 font-semibold mt-1">Instagram Community</p>
               </div>
               <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                <span className="font-poppins font-black text-2xl text-emerald-500">100%</span>
-                <p className="text-xs text-zinc-400 font-semibold mt-1">Safety Record</p>
+                <span className="font-poppins font-black text-xl sm:text-2xl text-emerald-500">
+                  25,000+
+                </span>
+                <p className="text-[11px] text-zinc-400 font-semibold mt-1">Happy Yatris Guided</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <span className="font-poppins font-black text-xl sm:text-2xl text-amber-500">
+                  24x7
+                </span>
+                <p className="text-[11px] text-zinc-400 font-semibold mt-1">Haridwar Support</p>
               </div>
             </div>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-zinc-900 aspect-4/3">
-            <img
-              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200"
-              alt="Himalayan Basecamp"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6 text-white">
-              <p className="text-xs font-semibold">
-                Camp 1 at Spiti Valley — 4,200m above sea level under a crystal-clear Milky Way.
-              </p>
+          {/* Client Business Profile Showcase Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl space-y-6">
+            <div className="flex items-center gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-5">
+              <img
+                src="/assets/aistudio/Screenshot_20261108-104735_f720548e.png"
+                alt="Om Travels & Adventure On The Way"
+                className="w-20 h-20 rounded-2xl object-cover border-2 border-[#FF6B35]"
+              />
+              <div>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase">
+                  ● Verified Travel Company
+                </span>
+                <h4 className="font-poppins font-black text-lg text-zinc-900 dark:text-white mt-1">
+                  Om Travels & Adventure On The Way
+                </h4>
+                <p className="text-xs text-zinc-500">Haridwar, Devbhoomi Uttarakhand</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60">
+                <MapPin className="w-4 h-4 text-[#FF6B35] shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-zinc-900 dark:text-white block">
+                    Registered Haridwar Office Address:
+                  </span>
+                  <span className="text-zinc-600 dark:text-zinc-300">
+                    4, Devpura, Haridwar, Uttarakhand 249401, India
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60">
+                <Phone className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-zinc-900 dark:text-white block">
+                    24x7 Yatra Booking Helplines:
+                  </span>
+                  <div className="flex flex-wrap gap-3 mt-1 font-bold text-[#FF6B35]">
+                    <a href="tel:+919421709258" className="hover:underline">
+                      +91 94217 09258 (Primary / WhatsApp)
+                    </a>
+                    <span>•</span>
+                    <a href="tel:+918668740237" className="hover:underline">
+                      +91 86687 40237 (Secondary)
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60">
+                <Instagram className="w-4 h-4 text-pink-500 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-zinc-900 dark:text-white block">
+                    Official Instagram Community:
+                  </span>
+                  <a
+                    href="https://instagram.com/adventure_on_the_way"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-pink-600 dark:text-pink-400 font-bold hover:underline"
+                  >
+                    @adventure_on_the_way (71,175 Followers)
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -88,10 +167,10 @@ export const AboutPage: React.FC = () => {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h4 className="font-poppins font-bold text-base text-zinc-900 dark:text-white">
-              No Compromise On Safety
+              Safe & Verified Himalayan Fleet
             </h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              Every trek carries portable hyperbaric bags, oxygen cylinders, pulse oximeters, and first-aid kits verified by military doctors.
+              Experienced hill drivers born in Uttarakhand, oxygen cylinders on high-altitude Yatras (Kedarnath & Aadi Kailash), and 24x7 Haridwar control room monitoring.
             </p>
           </div>
 
@@ -100,10 +179,10 @@ export const AboutPage: React.FC = () => {
               <Heart className="w-5 h-5" />
             </div>
             <h4 className="font-poppins font-bold text-base text-zinc-900 dark:text-white">
-              Empowering Mountain Locals
+              Authentic Devbhoomi Hospitality
             </h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              85% of our staff—cooks, mule handlers, driving captains, and porters—are native to Himachal, Ladakh, and Uttarakhand.
+              Hygienic pure vegetarian & Jain meals on Chardham routes, handpicked scenic hotels near temples, and dedicated care for senior citizens and families.
             </p>
           </div>
 
@@ -112,45 +191,11 @@ export const AboutPage: React.FC = () => {
               <Award className="w-5 h-5" />
             </div>
             <h4 className="font-poppins font-bold text-base text-zinc-900 dark:text-white">
-              Leave No Trace Eco-Pledge
+              Transparent Pricing & Direct Booking
             </h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              We bring down 100% of non-biodegradable waste from every high-altitude campsite. We protect the valleys we cherish.
+              Zero middleman commission. Book directly with our Haridwar head office via UPI (`9421709258@upi`) or 20% advance reservation token.
             </p>
-          </div>
-        </div>
-
-        {/* Team Section */}
-        <div className="space-y-8">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#FF6B35]">
-              Leadership Team
-            </span>
-            <h3 className="font-poppins font-black text-2xl sm:text-3xl text-zinc-900 dark:text-white">
-              Meet the Expedition Commanders
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {leaders.map((lead, idx) => (
-              <div
-                key={idx}
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm flex flex-col"
-              >
-                <img
-                  src={lead.image}
-                  alt={lead.name}
-                  className="w-full h-56 object-cover"
-                />
-                <div className="p-6 space-y-1">
-                  <h4 className="font-poppins font-bold text-base text-zinc-900 dark:text-white">
-                    {lead.name}
-                  </h4>
-                  <p className="text-xs font-semibold text-[#FF6B35]">{lead.role}</p>
-                  <p className="text-xs text-zinc-400 pt-1">{lead.exp}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -160,21 +205,31 @@ export const AboutPage: React.FC = () => {
           style={{ backgroundColor: settings.primaryColor }}
         >
           <h3 className="font-poppins font-black text-2xl sm:text-3xl">
-            Ready to Live The Adventure?
+            Haridwar se Himalaya Tak — Ready for Your Next Yatra?
           </h3>
           <p className="text-xs sm:text-sm text-zinc-200 max-w-lg mx-auto">
-            Book online in under 2 minutes with flexible 20% advance token payment or instant UPI QR clearance.
+            Explore our 12+ Uttarakhand & Himalayan packages or talk to our Haridwar travel desk at +91 94217 09258.
           </p>
-          <button
-            onClick={() => {
-              setActiveTab('destinations');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="px-8 py-3 rounded-2xl font-bold text-sm bg-[#FF6B35] hover:bg-[#e85822] transition shadow-lg inline-flex items-center gap-2"
-          >
-            <span>Explore Tour Packages</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              onClick={() => {
+                setActiveTab('destinations');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-8 py-3 rounded-2xl font-bold text-sm bg-[#FF6B35] hover:bg-[#e85822] transition shadow-lg inline-flex items-center gap-2"
+            >
+              <span>Explore All 12+ Tour Packages</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <a
+              href="https://wa.me/919421709258?text=Hi%20Adventure%20On%20The%20Way!%20I%20want%20to%20plan%20a%20Yatra."
+              target="_blank"
+              rel="noreferrer"
+              className="px-6 py-3 rounded-2xl font-bold text-sm bg-white/10 hover:bg-white/20 border border-white/20 transition inline-flex items-center gap-2"
+            >
+              <span>Chat on WhatsApp (+91 94217 09258)</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

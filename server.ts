@@ -16,6 +16,10 @@ import {
   deleteCouponFromDb,
   updateSiteSettingsInDb,
   updateUserInDb,
+  createGalleryItemInDb,
+  deleteGalleryItemFromDb,
+  createEnquiryInDb,
+  updateEnquiryStatusInDb,
 } from './src/db/repository.ts';
 
 dotenv.config();
@@ -27,14 +31,14 @@ async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
 
-  app.use(express.json({ limit: '5mb' }));
+  app.use(express.json({ limit: '25mb' }));
 
   // Health check endpoint
   app.get('/health', (_req, res) => {
     res.status(200).send('OK');
   });
 
-  // Public state bootstrap endpoint (fetches destinations, coupons, settings, bookings from PostgreSQL)
+  // Public state bootstrap endpoint (fetches destinations, coupons, settings, bookings, gallery, enquiries from PostgreSQL)
   app.get('/api/state', async (_req, res) => {
     try {
       const state = await getAllAppState();
@@ -103,6 +107,38 @@ async function startServer() {
     }
   });
 
+  // Razorpay / Payment Order Creation & Verification API
+  app.post('/api/create-order', async (req, res) => {
+    try {
+      const { amount, currency = 'INR', receipt } = req.body;
+      res.status(200).json({
+        id: `order_${Date.now()}`,
+        entity: 'order',
+        amount: Math.round((Number(amount) || 0) * 100),
+        currency,
+        receipt: receipt || `rcpt_${Date.now()}`,
+        status: 'created',
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || 'Failed to create payment order' });
+    }
+  });
+
+  app.post('/api/verify-payment', async (req, res) => {
+    try {
+      const { bookingId } = req.body;
+      if (bookingId) {
+        await updateBookingInDb(bookingId, {
+          paymentStatus: 'Paid',
+          status: 'Confirmed',
+        });
+      }
+      res.status(200).json({ verified: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || 'Failed to verify payment' });
+    }
+  });
+
   // Destinations CRUD in PostgreSQL
   app.post('/api/destinations', async (req, res) => {
     try {
@@ -136,6 +172,56 @@ async function startServer() {
       console.error('Failed to delete destination in PostgreSQL:', error);
       res.status(500).json({
         error: error.message || 'Failed to delete destination',
+      });
+    }
+  });
+
+  // Gallery CRUD in PostgreSQL
+  app.post('/api/gallery', async (req, res) => {
+    try {
+      const saved = await createGalleryItemInDb(req.body);
+      res.status(201).json(saved);
+    } catch (error: any) {
+      console.error('Failed to save gallery image in PostgreSQL:', error);
+      res.status(500).json({
+        error: error.message || 'Failed to save gallery image',
+      });
+    }
+  });
+
+  app.delete('/api/gallery/:id', async (req, res) => {
+    try {
+      await deleteGalleryItemFromDb(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Failed to delete gallery image from PostgreSQL:', error);
+      res.status(500).json({
+        error: error.message || 'Failed to delete gallery image',
+      });
+    }
+  });
+
+  // Enquiries CRUD in PostgreSQL
+  app.post('/api/enquiries', async (req, res) => {
+    try {
+      const saved = await createEnquiryInDb(req.body);
+      res.status(201).json(saved);
+    } catch (error: any) {
+      console.error('Failed to save enquiry in PostgreSQL:', error);
+      res.status(500).json({
+        error: error.message || 'Failed to save enquiry',
+      });
+    }
+  });
+
+  app.patch('/api/enquiries/:id', async (req, res) => {
+    try {
+      await updateEnquiryStatusInDb(req.params.id, req.body.status);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Failed to update enquiry status:', error);
+      res.status(500).json({
+        error: error.message || 'Failed to update enquiry status',
       });
     }
   });
@@ -197,7 +283,7 @@ async function startServer() {
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
-        res.status(200).send('Adventure on the Way is starting...');
+        res.status(200).send('Om Travels & Adventure On The Way is starting...');
       }
     });
   }

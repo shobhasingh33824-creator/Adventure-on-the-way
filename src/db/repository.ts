@@ -7,6 +7,8 @@ import {
   coupons,
   siteSettings,
   notifications,
+  gallery,
+  enquiries,
   ItineraryDaySchema,
 } from './schema.ts';
 import {
@@ -16,6 +18,8 @@ import {
   initialUsers,
   initialBookings,
   initialNotifications,
+  initialGallery,
+  initialEnquiries,
 } from '../data/initialData.ts';
 import type {
   TourPackage,
@@ -28,6 +32,8 @@ import type {
   TourCategory,
   BookingStatus,
   PaymentMethod,
+  GalleryItem,
+  Enquiry,
 } from '../types/index.ts';
 
 function slugify(str: string): string {
@@ -48,7 +54,7 @@ function mapRowToPackage(row: typeof destinations.$inferSelect): TourPackage {
     duration: row.duration,
     days: row.durationDays,
     difficulty: (row.difficulty as DifficultyLevel) || 'Moderate',
-    category: (row.category as TourCategory) || 'Trek',
+    category: (row.category as TourCategory) || 'Chardham',
     rating: Number(row.rating) || 4.9,
     reviewCount: row.totalReviews || 100,
     images: Array.isArray(row.images) ? row.images : [],
@@ -57,10 +63,10 @@ function mapRowToPackage(row: typeof destinations.$inferSelect): TourPackage {
     altitude:
       row.itinerary && row.itinerary[0]?.altitude
         ? row.itinerary[0].altitude
-        : '11,500 ft',
-    bestSeason: 'May – Oct',
-    groupSize: `Max ${row.maxSeats} Adventurers`,
-    startEndLocation: row.pickupPoint || 'Delhi / Manali',
+        : '11,755 ft',
+    bestSeason: 'May – Nov',
+    groupSize: `Max ${row.maxSeats} Yatris`,
+    startEndLocation: row.pickupPoint || 'Haridwar (4, Devpura)',
     maxSeats: row.maxSeats,
     availableSeats: row.availableSeats,
     featured: row.featured,
@@ -75,7 +81,7 @@ function mapRowToPackage(row: typeof destinations.$inferSelect): TourPackage {
           title: d.title,
           description: d.description,
           meals: Array.isArray(d.meals) ? d.meals.join(', ') : 'Breakfast & Dinner',
-          stay: d.accommodation || 'Hotel / Alpine Camp',
+          stay: d.accommodation || 'Deluxe Hotel / Swiss Camp',
           altitude: d.altitude,
         }))
       : [],
@@ -89,7 +95,7 @@ function mapPackageToRow(pkg: TourPackage): typeof destinations.$inferInsert {
     title: d.title,
     description: d.description,
     meals: d.meals ? d.meals.split(',').map((s) => s.trim()) : ['Breakfast', 'Dinner'],
-    accommodation: d.stay || 'Alpine Camp / Boutique Stay',
+    accommodation: d.stay || 'Deluxe Hotel / Camp',
     altitude: d.altitude || pkg.altitude,
   }));
 
@@ -98,7 +104,7 @@ function mapPackageToRow(pkg: TourPackage): typeof destinations.$inferInsert {
     title: pkg.title,
     slug: slugify(pkg.title),
     location: pkg.location,
-    state: pkg.state || 'Himachal Pradesh',
+    state: pkg.state || 'Uttarakhand',
     category: pkg.category,
     price: pkg.originalPrice || pkg.price,
     discountPrice: pkg.price,
@@ -106,7 +112,7 @@ function mapPackageToRow(pkg: TourPackage): typeof destinations.$inferInsert {
     durationDays: pkg.days || 5,
     durationNights: Math.max(1, (pkg.days || 5) - 1),
     maxSeats: pkg.maxSeats || 20,
-    availableSeats: pkg.availableSeats ?? 12,
+    availableSeats: pkg.availableSeats ?? 8,
     difficulty: pkg.difficulty,
     shortDescription: pkg.shortDescription || pkg.description.slice(0, 140),
     description: pkg.description,
@@ -118,10 +124,10 @@ function mapPackageToRow(pkg: TourPackage): typeof destinations.$inferInsert {
     isBestSeller: Boolean(pkg.isBestSeller ?? pkg.trending),
     isActive: pkg.isActive !== false,
     rating: pkg.rating || 4.9,
-    totalReviews: pkg.reviewCount || 85,
-    mapCoordinates: { lat: 32.2432, lng: 77.1892 },
-    pickupPoint: pkg.startEndLocation || 'Delhi / Manali',
-    nextAvailableDates: ['2025-05-15', '2025-06-01', '2025-06-15'],
+    totalReviews: pkg.reviewCount || 120,
+    mapCoordinates: { lat: 29.9457, lng: 78.1642 },
+    pickupPoint: pkg.startEndLocation || 'Haridwar (4, Devpura)',
+    nextAvailableDates: ['2026-05-10', '2026-05-20', '2026-06-01'],
     createdBy: 'admin@adventureontheway.com',
   };
 }
@@ -149,6 +155,7 @@ function mapRowToBooking(row: typeof bookings.$inferSelect): Booking {
     paymentStatus:
       (row.paymentStatus as Booking['paymentStatus']) || 'Pending Verification',
     transactionId: row.utrNumber || undefined,
+    paymentScreenshot: row.paymentScreenshot || undefined,
     bookingStatus: (row.status as BookingStatus) || 'Pending Verification',
     createdAt:
       row.createdAt instanceof Date
@@ -166,7 +173,7 @@ function mapBookingToRow(b: Booking): typeof bookings.$inferInsert {
     packageId: b.packageId,
     packageTitle: b.packageTitle,
     packageImage: b.packageImage,
-    packageDuration: '6D / 5N',
+    packageDuration: '11D / 10N',
     userId: b.userId,
     customerName: b.userName,
     customerEmail: b.userEmail,
@@ -187,6 +194,7 @@ function mapBookingToRow(b: Booking): typeof bookings.$inferInsert {
     paymentMethod: b.paymentMethod,
     paymentStatus: b.paymentStatus,
     utrNumber: b.transactionId || null,
+    paymentScreenshot: b.paymentScreenshot || '',
     status: b.bookingStatus,
   };
 }
@@ -200,7 +208,7 @@ function mapRowToUser(row: typeof users.$inferSelect): User {
     avatar:
       row.profileImageUrl ||
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    role: row.role === 'admin' ? 'admin' : 'user',
+    role: row.role === 'admin' ? 'admin' : row.role === 'staff' ? 'staff' : 'user',
     isBlocked: row.isBlocked,
     createdAt:
       row.createdAt instanceof Date
@@ -211,38 +219,73 @@ function mapRowToUser(row: typeof users.$inferSelect): User {
 
 export async function ensureSeeded(): Promise<void> {
   try {
-    const existingDestinations = await db.select().from(destinations).limit(1);
-    if (existingDestinations.length === 0) {
+    // Ensure the 12 real Uttarakhand & Himalayan destinations exist in PostgreSQL
+    const chardhamCheck = await db
+      .select()
+      .from(destinations)
+      .where(eq(destinations.id, 'chardham-yatra-uttarakhand'))
+      .limit(1);
+
+    if (chardhamCheck.length === 0) {
+      // Replace any older demo destinations with the 12 real Uttarakhand destinations
+      await db.delete(destinations);
       await db
         .insert(destinations)
         .values(initialPackages.map(mapPackageToRow))
         .onConflictDoNothing();
     }
 
+    // Ensure site_settings has the exact Om Travels & Adventure On The Way Haridwar data
     const existingSettings = await db.select().from(siteSettings).limit(1);
-    if (existingSettings.length === 0) {
+    if (
+      existingSettings.length === 0 ||
+      existingSettings[0].brandName !== 'Om Travels & Adventure On The Way'
+    ) {
       await db
         .insert(siteSettings)
         .values({
           id: 1,
           brandName: initialSiteSettings.brandName,
+          shortName: initialSiteSettings.shortName || 'Adventure On The Way',
           tagline: initialSiteSettings.tagline,
+          aboutText: initialSiteSettings.aboutText || '',
           primaryColor: initialSiteSettings.primaryColor,
           accentColor: initialSiteSettings.accentColor,
           heroBannerUrl: initialSiteSettings.heroBannerImage,
-          heroHeadline: 'Your Next Adventure Starts Here',
+          logoUrl: initialSiteSettings.logoUrl || '',
+          heroHeadline: 'Haridwar se Himalaya Tak – Live The Adventure',
           contactEmail: initialSiteSettings.contactEmail,
           contactPhone: initialSiteSettings.contactPhone,
+          secondaryPhone: initialSiteSettings.secondaryPhone,
           whatsappNumber: initialSiteSettings.whatsappNumber,
           whatsappLink: initialSiteSettings.whatsappLink,
           callLink: initialSiteSettings.callLink,
+          secondaryCallLink: initialSiteSettings.secondaryCallLink,
           officeAddress: initialSiteSettings.address,
           upiId: initialSiteSettings.upiId,
-          instagramUrl: 'https://instagram.com/adventureontheway',
+          instagramUrl: initialSiteSettings.instagramUrl,
+          instagramHandle: initialSiteSettings.instagramHandle,
+          instagramFollowers: initialSiteSettings.instagramFollowers,
+          openHours: initialSiteSettings.openHours,
           facebookUrl: 'https://facebook.com/adventureontheway',
           youtubeUrl: 'https://youtube.com/@adventureontheway',
         })
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: siteSettings.id,
+          set: {
+            brandName: initialSiteSettings.brandName,
+            shortName: initialSiteSettings.shortName || 'Adventure On The Way',
+            tagline: initialSiteSettings.tagline,
+            aboutText: initialSiteSettings.aboutText || '',
+            contactPhone: initialSiteSettings.contactPhone,
+            secondaryPhone: initialSiteSettings.secondaryPhone,
+            officeAddress: initialSiteSettings.address,
+            instagramUrl: initialSiteSettings.instagramUrl,
+            instagramHandle: initialSiteSettings.instagramHandle,
+            instagramFollowers: initialSiteSettings.instagramFollowers,
+            openHours: initialSiteSettings.openHours,
+          },
+        });
     }
 
     const existingCoupons = await db.select().from(coupons).limit(1);
@@ -277,7 +320,7 @@ export async function ensureSeeded(): Promise<void> {
             role: u.role,
             isBlocked: Boolean(u.isBlocked),
             totalBookings: 1,
-            wishlist: ['spiti-valley-expedition', 'ladakh-bike-odyssey'],
+            wishlist: ['chardham-yatra-uttarakhand', 'aadi-kailash-om-parvat-yatra'],
           }))
         )
         .onConflictDoNothing();
@@ -306,6 +349,45 @@ export async function ensureSeeded(): Promise<void> {
         )
         .onConflictDoNothing();
     }
+
+    const existingGallery = await db.select().from(gallery).limit(1);
+    if (existingGallery.length === 0) {
+      await db
+        .insert(gallery)
+        .values(
+          initialGallery.map((g) => ({
+            id: g.id,
+            url: g.url,
+            title: g.title,
+            tourId: g.tourId || '',
+            tourName: g.tourName || '',
+            category: g.category,
+            sizeKb: g.sizeKb,
+            width: g.width,
+            height: g.height,
+            uploadedBy: g.uploadedBy,
+          }))
+        )
+        .onConflictDoNothing();
+    }
+
+    const existingEnquiries = await db.select().from(enquiries).limit(1);
+    if (existingEnquiries.length === 0) {
+      await db
+        .insert(enquiries)
+        .values(
+          initialEnquiries.map((e) => ({
+            id: e.id,
+            name: e.name,
+            phone: e.phone,
+            email: e.email,
+            destination: e.destination,
+            message: e.message,
+            status: e.status,
+          }))
+        )
+        .onConflictDoNothing();
+    }
   } catch (error) {
     console.error('Database seed check failed:', error);
     throw new Error('Database initialization failed. Please try again later.', {
@@ -329,7 +411,7 @@ export async function getOrCreateUser(
       .values({
         uid,
         email,
-        fullName: fullName || email.split('@')[0] || 'Adventurer',
+        fullName: fullName || email.split('@')[0] || 'Yatri',
         phone: '+91 94217 09258',
         profileImageUrl:
           avatar ||
@@ -337,7 +419,7 @@ export async function getOrCreateUser(
         role: isAdminEmail ? 'admin' : 'user',
         isBlocked: false,
         totalBookings: 0,
-        wishlist: [],
+        wishlist: ['chardham-yatra-uttarakhand'],
       })
       .onConflictDoUpdate({
         target: users.uid,
@@ -366,31 +448,50 @@ export async function getAllAppState() {
   try {
     await ensureSeeded();
 
-    const [pkgRows, bookingRows, userRows, couponRows, settingRows, noteRows] =
-      await Promise.all([
-        db.select().from(destinations).orderBy(desc(destinations.createdAt)),
-        db.select().from(bookings).orderBy(desc(bookings.createdAt)),
-        db.select().from(users).orderBy(desc(users.createdAt)),
-        db.select().from(coupons),
-        db.select().from(siteSettings).limit(1),
-        db.select().from(notifications).orderBy(desc(notifications.createdAt)),
-      ]);
+    const [
+      pkgRows,
+      bookingRows,
+      userRows,
+      couponRows,
+      settingRows,
+      noteRows,
+      galleryRows,
+      enquiryRows,
+    ] = await Promise.all([
+      db.select().from(destinations).orderBy(desc(destinations.createdAt)),
+      db.select().from(bookings).orderBy(desc(bookings.createdAt)),
+      db.select().from(users).orderBy(desc(users.createdAt)),
+      db.select().from(coupons),
+      db.select().from(siteSettings).limit(1),
+      db.select().from(notifications).orderBy(desc(notifications.createdAt)),
+      db.select().from(gallery).orderBy(desc(gallery.createdAt)),
+      db.select().from(enquiries).orderBy(desc(enquiries.createdAt)),
+    ]);
 
     const sRow = settingRows[0];
     const mappedSettings: SiteSettings = sRow
       ? {
           brandName: sRow.brandName,
+          shortName: sRow.shortName || 'Adventure On The Way',
           tagline: sRow.tagline,
+          aboutText: sRow.aboutText,
           primaryColor: sRow.primaryColor,
           accentColor: sRow.accentColor,
           heroBannerImage: sRow.heroBannerUrl,
+          logoUrl: sRow.logoUrl || '',
           contactEmail: sRow.contactEmail,
           contactPhone: sRow.contactPhone,
+          secondaryPhone: sRow.secondaryPhone || '+91 86687 40237',
           upiId: sRow.upiId,
           whatsappNumber: sRow.whatsappNumber,
           whatsappLink: sRow.whatsappLink,
           callLink: sRow.callLink,
+          secondaryCallLink: sRow.secondaryCallLink || 'tel:+918668740237',
           address: sRow.officeAddress,
+          instagramUrl: sRow.instagramUrl || 'https://instagram.com/adventure_on_the_way',
+          instagramHandle: sRow.instagramHandle || '@adventure_on_the_way',
+          instagramFollowers: sRow.instagramFollowers || '71,175 Followers',
+          openHours: sRow.openHours || 'Open 24 Hours',
         }
       : initialSiteSettings;
 
@@ -415,6 +516,37 @@ export async function getAllAppState() {
       read: n.read,
     }));
 
+    const mappedGallery: GalleryItem[] = galleryRows.map((g) => ({
+      id: g.id,
+      url: g.url,
+      title: g.title,
+      tourId: g.tourId || '',
+      tourName: g.tourName || '',
+      category: (g.category as GalleryItem['category']) || 'tour',
+      sizeKb: g.sizeKb,
+      width: g.width,
+      height: g.height,
+      uploadedBy: g.uploadedBy,
+      createdAt:
+        g.createdAt instanceof Date
+          ? g.createdAt.toISOString().split('T')[0]
+          : String(g.createdAt),
+    }));
+
+    const mappedEnquiries: Enquiry[] = enquiryRows.map((e) => ({
+      id: e.id,
+      name: e.name,
+      phone: e.phone,
+      email: e.email,
+      destination: e.destination,
+      message: e.message,
+      status: (e.status as Enquiry['status']) || 'New',
+      createdAt:
+        e.createdAt instanceof Date
+          ? e.createdAt.toISOString().split('T')[0]
+          : String(e.createdAt),
+    }));
+
     return {
       packages: pkgRows.map(mapRowToPackage),
       bookings: bookingRows.map(mapRowToBooking),
@@ -422,6 +554,8 @@ export async function getAllAppState() {
       coupons: mappedCoupons,
       settings: mappedSettings,
       notifications: mappedNotes,
+      gallery: mappedGallery,
+      enquiries: mappedEnquiries,
     };
   } catch (error) {
     console.error('Database query failed in getAllAppState:', error);
@@ -494,14 +628,13 @@ export async function createBookingInDb(booking: Booking): Promise<Booking> {
       })
       .returning();
 
-    // Also add an admin notification in PostgreSQL
     await db
       .insert(notifications)
       .values({
         id: `notif-${Date.now()}`,
         type: 'booking',
         title: 'New Booking Received',
-        message: `${booking.userName} booked ${booking.packageTitle} for ${booking.adults + booking.children} pax (₹${booking.totalAmount.toLocaleString('en-IN')}).`,
+        message: `${booking.userName} booked ${booking.packageTitle} for ${booking.adults + booking.children} Yatris (₹${booking.totalAmount.toLocaleString('en-IN')}).`,
         read: false,
       })
       .onConflictDoNothing();
@@ -579,19 +712,27 @@ export async function updateSiteSettingsInDb(
       .values({
         id: 1,
         brandName: newSettings.brandName,
+        shortName: newSettings.shortName || 'Adventure On The Way',
         tagline: newSettings.tagline,
+        aboutText: newSettings.aboutText || '',
         primaryColor: newSettings.primaryColor,
         accentColor: newSettings.accentColor,
         heroBannerUrl: newSettings.heroBannerImage,
-        heroHeadline: 'Your Next Adventure Starts Here',
+        logoUrl: newSettings.logoUrl || '',
+        heroHeadline: 'Haridwar se Himalaya Tak – Live The Adventure',
         contactEmail: newSettings.contactEmail,
         contactPhone: newSettings.contactPhone,
+        secondaryPhone: newSettings.secondaryPhone || '+91 86687 40237',
         whatsappNumber: newSettings.whatsappNumber,
         whatsappLink: newSettings.whatsappLink,
         callLink: newSettings.callLink,
+        secondaryCallLink: newSettings.secondaryCallLink || 'tel:+918668740237',
         officeAddress: newSettings.address,
         upiId: newSettings.upiId,
-        instagramUrl: 'https://instagram.com/adventureontheway',
+        instagramUrl: newSettings.instagramUrl || 'https://instagram.com/adventure_on_the_way',
+        instagramHandle: newSettings.instagramHandle || '@adventure_on_the_way',
+        instagramFollowers: newSettings.instagramFollowers || '71,175 Followers',
+        openHours: newSettings.openHours || 'Open 24 Hours',
         facebookUrl: 'https://facebook.com/adventureontheway',
         youtubeUrl: 'https://youtube.com/@adventureontheway',
       })
@@ -599,17 +740,26 @@ export async function updateSiteSettingsInDb(
         target: siteSettings.id,
         set: {
           brandName: newSettings.brandName,
+          shortName: newSettings.shortName || 'Adventure On The Way',
           tagline: newSettings.tagline,
+          aboutText: newSettings.aboutText || '',
           primaryColor: newSettings.primaryColor,
           accentColor: newSettings.accentColor,
           heroBannerUrl: newSettings.heroBannerImage,
+          logoUrl: newSettings.logoUrl || '',
           contactEmail: newSettings.contactEmail,
           contactPhone: newSettings.contactPhone,
+          secondaryPhone: newSettings.secondaryPhone || '+91 86687 40237',
           whatsappNumber: newSettings.whatsappNumber,
           whatsappLink: newSettings.whatsappLink,
           callLink: newSettings.callLink,
+          secondaryCallLink: newSettings.secondaryCallLink || 'tel:+918668740237',
           officeAddress: newSettings.address,
           upiId: newSettings.upiId,
+          instagramUrl: newSettings.instagramUrl || 'https://instagram.com/adventure_on_the_way',
+          instagramHandle: newSettings.instagramHandle || '@adventure_on_the_way',
+          instagramFollowers: newSettings.instagramFollowers || '71,175 Followers',
+          openHours: newSettings.openHours || 'Open 24 Hours',
         },
       });
   } catch (error) {
@@ -626,6 +776,7 @@ export async function updateUserInDb(
     fullName: string;
     phone: string;
     profileImageUrl: string;
+    role: string;
     isBlocked: boolean;
     wishlist: string[];
   }>
@@ -634,6 +785,120 @@ export async function updateUserInDb(
     await db.update(users).set(updates).where(eq(users.uid, uid));
   } catch (error) {
     console.error('Database query failed in updateUserInDb:', error);
+    throw new Error('Database query failed. Please try again later.', {
+      cause: error,
+    });
+  }
+}
+
+export async function createGalleryItemInDb(item: GalleryItem): Promise<GalleryItem> {
+  try {
+    const inserted = await db
+      .insert(gallery)
+      .values({
+        id: item.id,
+        url: item.url,
+        title: item.title,
+        tourId: item.tourId || '',
+        tourName: item.tourName || '',
+        category: item.category || 'tour',
+        sizeKb: item.sizeKb || 220,
+        width: item.width || 1200,
+        height: item.height || 800,
+        uploadedBy: item.uploadedBy || 'admin@adventureontheway.com',
+      })
+      .onConflictDoUpdate({
+        target: gallery.id,
+        set: {
+          url: item.url,
+          title: item.title,
+          tourId: item.tourId || '',
+          tourName: item.tourName || '',
+          category: item.category || 'tour',
+        },
+      })
+      .returning();
+
+    const g = inserted[0];
+    return {
+      id: g.id,
+      url: g.url,
+      title: g.title,
+      tourId: g.tourId || '',
+      tourName: g.tourName || '',
+      category: (g.category as GalleryItem['category']) || 'tour',
+      sizeKb: g.sizeKb,
+      width: g.width,
+      height: g.height,
+      uploadedBy: g.uploadedBy,
+      createdAt:
+        g.createdAt instanceof Date
+          ? g.createdAt.toISOString().split('T')[0]
+          : String(g.createdAt),
+    };
+  } catch (error) {
+    console.error('Database query failed in createGalleryItemInDb:', error);
+    throw new Error('Database query failed. Please try again later.', {
+      cause: error,
+    });
+  }
+}
+
+export async function deleteGalleryItemFromDb(id: string): Promise<void> {
+  try {
+    await db.delete(gallery).where(eq(gallery.id, id));
+  } catch (error) {
+    console.error('Database query failed in deleteGalleryItemFromDb:', error);
+    throw new Error('Database query failed. Please try again later.', {
+      cause: error,
+    });
+  }
+}
+
+export async function createEnquiryInDb(enq: Enquiry): Promise<Enquiry> {
+  try {
+    const inserted = await db
+      .insert(enquiries)
+      .values({
+        id: enq.id,
+        name: enq.name,
+        phone: enq.phone,
+        email: enq.email,
+        destination: enq.destination,
+        message: enq.message,
+        status: enq.status || 'New',
+      })
+      .returning();
+    const r = inserted[0];
+    return {
+      id: r.id,
+      name: r.name,
+      phone: r.phone,
+      email: r.email,
+      destination: r.destination,
+      message: r.message,
+      status: (r.status as Enquiry['status']) || 'New',
+      createdAt:
+        r.createdAt instanceof Date
+          ? r.createdAt.toISOString().split('T')[0]
+          : String(r.createdAt),
+    };
+  } catch (error) {
+    console.error('Database query failed in createEnquiryInDb:', error);
+    throw new Error('Database query failed. Please try again later.', {
+      cause: error,
+    });
+  }
+}
+
+export async function updateEnquiryStatusInDb(
+  id: string,
+  status: Enquiry['status']
+): Promise<void> {
+  try {
+    await db.update(enquiries).set({ status }).where(eq(enquiries.id, id));
+  } catch (error) {
+    console.error('Database query failed in updateEnquiryStatusInDb:', error);
     throw new Error('Database query failed. Please try again later.', {
       cause: error,
     });

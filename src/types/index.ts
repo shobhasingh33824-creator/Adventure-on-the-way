@@ -1,5 +1,15 @@
 export type DifficultyLevel = 'Easy' | 'Moderate' | 'Challenging' | 'Extreme';
-export type TourCategory = 'Trek' | 'Bike Trip' | 'Camping' | 'Expedition' | 'Family' | 'Water Sports' | 'Honeymoon';
+export type TourCategory =
+  | 'Chardham'
+  | 'Yatra'
+  | 'Trek'
+  | 'Bike Trip'
+  | 'Camping'
+  | 'Expedition'
+  | 'Family'
+  | 'Water Sports'
+  | 'Honeymoon'
+  | 'Wildlife';
 
 export interface ItineraryDay {
   day: number;
@@ -54,7 +64,7 @@ export interface TourPackage {
 }
 
 export type BookingStatus = 'Pending Verification' | 'Confirmed' | 'Completed' | 'Cancelled';
-export type PaymentMethod = 'UPI' | 'Card' | 'NetBanking' | 'Pay on Trip';
+export type PaymentMethod = 'UPI' | 'Razorpay' | 'Card' | 'NetBanking' | 'Pay on Trip';
 
 export interface Booking {
   id: string;
@@ -77,6 +87,7 @@ export interface Booking {
   paymentMethod: PaymentMethod;
   paymentStatus: 'Paid' | 'Advance Paid' | 'Pending Verification' | 'Refunded';
   transactionId?: string;
+  paymentScreenshot?: string;
   bookingStatus: BookingStatus;
   createdAt: string;
   idProofType?: string;
@@ -90,7 +101,7 @@ export interface User {
   email: string;
   phone: string;
   avatar: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'staff';
   isBlocked?: boolean;
   createdAt: string;
   emergencyContact?: string;
@@ -108,17 +119,51 @@ export interface Coupon {
 
 export interface SiteSettings {
   brandName: string;
+  shortName?: string;
   tagline: string;
+  aboutText?: string;
   primaryColor: string;
   accentColor: string;
   heroBannerImage: string;
+  logoUrl?: string;
   contactEmail: string;
   contactPhone: string;
+  secondaryPhone: string;
   upiId: string;
   whatsappNumber: string;
   whatsappLink: string;
   callLink: string;
+  secondaryCallLink: string;
   address: string;
+  instagramUrl: string;
+  instagramHandle: string;
+  instagramFollowers: string;
+  openHours: string;
+}
+
+export interface GalleryItem {
+  id: string;
+  url: string;
+  title: string;
+  tourId?: string;
+  tourName?: string;
+  category: 'tour' | 'logo' | 'banner' | 'payment' | 'profile' | 'blog';
+  sizeKb: number;
+  width: number;
+  height: number;
+  uploadedBy: string;
+  createdAt: string;
+}
+
+export interface Enquiry {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  destination: string;
+  message: string;
+  status: 'New' | 'Contacted' | 'Converted';
+  createdAt: string;
 }
 
 export interface BlogPost {

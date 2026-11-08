@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PackageCard } from '../packages/PackageCard';
+import { ImageUploadPicker } from '../common/ImageUploadPicker';
 import {
   User,
   CalendarCheck,
@@ -8,15 +9,10 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  Download,
   Printer,
   Share2,
-  AlertCircle,
-  CheckCircle2,
   Clock,
-  MapPin,
   Compass,
-  ArrowRight,
   ShieldCheck,
   Edit2,
   Save,
@@ -35,7 +31,6 @@ export const UserDashboard: React.FC = () => {
     setAuthModalOpen,
     setActiveTab,
     settings,
-    showToast,
   } = useApp();
 
   const [activeTab, setActiveTabState] = useState<'bookings' | 'wishlist' | 'payments' | 'profile'>('bookings');
@@ -45,6 +40,7 @@ export const UserDashboard: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(currentUser?.name || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [avatar, setAvatar] = useState(currentUser?.avatar || '');
   const [emergencyContact, setEmergencyContact] = useState(currentUser?.emergencyContact || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
 
@@ -90,7 +86,7 @@ export const UserDashboard: React.FC = () => {
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUserProfile({ name, phone, emergencyContact, bio });
+    updateUserProfile({ name, phone, avatar: avatar || currentUser.avatar, emergencyContact, bio });
     setIsEditing(false);
   };
 
@@ -459,6 +455,19 @@ export const UserDashboard: React.FC = () => {
           </div>
 
           <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+            {isEditing && (
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
+                <ImageUploadPicker
+                  images={avatar ? [avatar] : [currentUser.avatar]}
+                  onChange={(urls) => setAvatar(urls[0] || currentUser.avatar)}
+                  singleMode={true}
+                  category="profile"
+                  tourName={`Profile Photo - ${currentUser.name}`}
+                  label="📸 Change Profile Photo From Phone Gallery / Camera"
+                />
+              </div>
+            )}
+
             <div className="space-y-1">
               <label className="font-bold text-zinc-700 dark:text-zinc-300">Full Name</label>
               <input
