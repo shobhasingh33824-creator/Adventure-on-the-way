@@ -627,10 +627,52 @@ export const AdminPanel: React.FC = () => {
     updateSettings(tempSettings);
   };
 
+  const adminNavItems = [
+    { id: 'dashboard', label: 'Dashboard', fullLabel: 'Admin Dashboard', icon: LayoutDashboard },
+    {
+      id: 'destinations',
+      label: 'Tours',
+      fullLabel: 'Manage Destinations',
+      icon: MapPin,
+      count: packages.length,
+    },
+    {
+      id: 'gallery',
+      label: 'Gallery',
+      fullLabel: 'Photo Gallery Manager',
+      icon: ImageIcon,
+      count: gallery.length,
+    },
+    {
+      id: 'bookings',
+      label: 'Bookings',
+      fullLabel: 'Manage Bookings',
+      icon: CalendarCheck,
+      count: bookings.length,
+    },
+    {
+      id: 'payments',
+      label: 'Payments',
+      fullLabel: 'UPI & Screenshots',
+      icon: CreditCard,
+      count: pendingPaymentsCount > 0 ? pendingPaymentsCount : undefined,
+    },
+    {
+      id: 'enquiries',
+      label: 'Enquiries',
+      fullLabel: 'Customer Enquiries',
+      icon: MessageSquare,
+      count: newEnquiriesCount > 0 ? newEnquiriesCount : enquiries.length,
+    },
+    { id: 'users', label: 'Users', fullLabel: 'Manage Users', icon: Users, count: allUsers.length },
+    { id: 'offers', label: 'Coupons', fullLabel: 'Offers & Coupons', icon: Tag, count: coupons.length },
+    { id: 'settings', label: 'Settings', fullLabel: 'Logo, Banner & Settings', icon: Palette },
+  ];
+
   return (
     <div className="min-h-screen bg-zinc-100 dark:bg-[#0c0c0e] text-zinc-900 dark:text-zinc-100 flex flex-col lg:flex-row transition-colors">
-      {/* ================= LEFT SIDEBAR ================= */}
-      <aside className="w-full lg:w-72 bg-white dark:bg-[#141417] border-r border-zinc-200 dark:border-zinc-800 flex flex-col justify-between shrink-0 no-print">
+      {/* ================= DESKTOP LEFT SIDEBAR ================= */}
+      <aside className="hidden lg:flex lg:w-68 xl:w-72 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto bg-white dark:bg-[#141417] border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between shrink-0 no-print">
         <div>
           <div className="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -664,64 +706,29 @@ export const AdminPanel: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Mobile 3-Step Publisher CTA inside Sidebar */}
+          {/* Quick 3-Step Publisher CTA inside Sidebar */}
           <div className="px-4 pt-4">
             <button
               onClick={() => handleOpenAddDestination(true)}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#FF6B35] to-[#e85822] text-white font-poppins font-bold text-xs shadow-lg flex items-center justify-center gap-2 hover:opacity-95 transition"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#FF6B35] to-[#e85822] text-white font-poppins font-bold text-xs shadow-md flex items-center justify-center gap-2 hover:opacity-95 transition"
             >
               <Camera className="w-4 h-4" />
-              <span>📸 Quick 3-Step Tour + Gallery Upload</span>
+              <span>Quick 3-Step Tour Upload</span>
             </button>
           </div>
 
           {/* Navigation Links */}
           <nav className="p-4 space-y-1 text-xs font-bold">
-            {[
-              { id: 'dashboard', label: 'Admin Dashboard', icon: LayoutDashboard },
-              {
-                id: 'destinations',
-                label: 'Manage Destinations',
-                icon: MapPin,
-                count: packages.length,
-              },
-              {
-                id: 'gallery',
-                label: 'Photo Gallery Manager',
-                icon: ImageIcon,
-                count: gallery.length,
-              },
-              {
-                id: 'bookings',
-                label: 'Manage Bookings',
-                icon: CalendarCheck,
-                count: bookings.length,
-              },
-              {
-                id: 'payments',
-                label: 'UPI & Screenshots',
-                icon: CreditCard,
-                count: pendingPaymentsCount > 0 ? pendingPaymentsCount : undefined,
-              },
-              {
-                id: 'enquiries',
-                label: 'Customer Enquiries',
-                icon: MessageSquare,
-                count: newEnquiriesCount > 0 ? newEnquiriesCount : enquiries.length,
-              },
-              { id: 'users', label: 'Manage Users', icon: Users, count: allUsers.length },
-              { id: 'offers', label: 'Offers & Coupons', icon: Tag, count: coupons.length },
-              { id: 'settings', label: 'Logo, Banner & Settings', icon: Palette },
-            ].map((item) => {
+            {adminNavItems.map((item) => {
               const Icon = item.icon;
               const isActiveTab = currentTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => setCurrentTab(item.id as any)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition ${
                     isActiveTab
-                      ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-md'
+                      ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                       : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                   }`}
                 >
@@ -729,7 +736,7 @@ export const AdminPanel: React.FC = () => {
                     <Icon
                       className={`w-4 h-4 ${isActiveTab ? 'text-[#FF6B35]' : 'text-zinc-400'}`}
                     />
-                    <span>{item.label}</span>
+                    <span>{item.fullLabel}</span>
                   </div>
                   {item.count !== undefined && (
                     <span
@@ -756,11 +763,11 @@ export const AdminPanel: React.FC = () => {
           {offlineDraftsCount > 0 && (
             <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] font-bold flex items-center gap-2">
               <WifiOff className="w-4 h-4 shrink-0" />
-              <span>{offlineDraftsCount} Offline Tour Draft(s) Queued</span>
+              <span>{offlineDraftsCount} Offline Draft(s) Queued</span>
             </div>
           )}
 
-          <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 flex items-center gap-3">
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
@@ -779,14 +786,14 @@ export const AdminPanel: React.FC = () => {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setActiveTab('home')}
-              className="py-2.5 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-xs font-bold text-zinc-700 dark:text-zinc-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+              className="py-2 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-xs font-bold text-zinc-700 dark:text-zinc-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Compass className="w-4 h-4 text-[#FF6B35]" />
               <span>Website</span>
             </button>
             <button
               onClick={() => logout()}
-              className="py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-600 dark:text-rose-400 border border-rose-500/30 transition flex items-center justify-center gap-1.5 cursor-pointer"
+              className="py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-600 dark:text-rose-400 border border-rose-500/30 transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <X className="w-4 h-4" />
               <span>Lock Admin</span>
@@ -797,65 +804,60 @@ export const AdminPanel: React.FC = () => {
 
       {/* ================= MAIN CONTENT AREA ================= */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header Bar - Responsive across Mobile, Tablet, and Desktop with NO hidden buttons */}
-        <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#141417]/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 no-print">
-          <div className="min-w-0">
-            <h1 className="font-poppins font-black text-base sm:text-xl text-zinc-900 dark:text-white capitalize">
-              {currentTab === 'dashboard' && 'Executive Performance Dashboard'}
-              {currentTab === 'destinations' && 'Manage Uttarakhand & Himalayan Tours'}
-              {currentTab === 'gallery' && 'Device Gallery & Tour Photo Manager'}
-              {currentTab === 'bookings' && 'Customer Bookings & Yatra Manifests'}
-              {currentTab === 'payments' && 'UPI (9421709258@upi) & Screenshot Verification'}
-              {currentTab === 'enquiries' && 'Customer Callback & Custom Yatra Enquiries'}
-              {currentTab === 'users' && 'Registered Travellers & Yatris'}
-              {currentTab === 'offers' && 'Promo Offers & Discount Coupons'}
-              {currentTab === 'settings' && 'Logo, Hero Banner & Haridwar Office Settings'}
-            </h1>
-            <p className="text-[11px] sm:text-xs text-zinc-400">
-              Admin ID: <strong className="text-emerald-500">@admin</strong> • <strong className="text-zinc-700 dark:text-zinc-200">+91 94217 09258 / +91 86687 40237</strong> • UPI: <strong className="text-[#FF6B35]">9421709258@upi</strong>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setCurrentTab('gallery')}
-              className="px-3 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <ImageIcon className="w-4 h-4 text-[#FF6B35]" />
-              <span>Gallery ({gallery.length})</span>
-            </button>
-
-            <button
-              onClick={() => handleOpenAddDestination(true)}
-              className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Camera className="w-4 h-4" />
-              <span>3-Step Quick Add</span>
-            </button>
-
-            <button
-              onClick={() => handleOpenAddDestination(false)}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-md flex items-center gap-1.5 hover:opacity-95 transition cursor-pointer"
-              style={{ backgroundColor: settings.accentColor }}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Tour</span>
-            </button>
-
-            {/* Notification Bell Dropdown */}
-            <div className="relative">
+        {/* Compact Sticky Top Header Bar */}
+        <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#141417]/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 no-print">
+          <div className="px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
               <button
-                onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-                className="relative p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 transition"
-                title="Notifications"
+                onClick={() => setActiveTab('home')}
+                className="lg:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 shrink-0"
+                title="Back to Website"
               >
-                <Bell className="w-4 h-4" />
-                {unreadNotifsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#FF6B35] text-white text-[10px] font-black flex items-center justify-center animate-bounce">
-                    {unreadNotifsCount}
-                  </span>
-                )}
+                <Compass className="w-4 h-4 text-[#FF6B35]" />
               </button>
+              <div className="min-w-0">
+                <h1 className="font-poppins font-bold text-sm sm:text-lg text-zinc-900 dark:text-white truncate">
+                  {adminNavItems.find((i) => i.id === currentTab)?.fullLabel || 'Admin Console'}
+                </h1>
+                <p className="hidden sm:block text-[11px] text-zinc-400 truncate">
+                  Admin: <strong className="text-emerald-500">@admin</strong> • +91 94217 09258 • UPI: <strong className="text-[#FF6B35]">9421709258@upi</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button
+                onClick={() => handleOpenAddDestination(true)}
+                className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition flex items-center gap-1 cursor-pointer"
+                title="3-Step Quick Tour Upload"
+              >
+                <Camera className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden md:inline">3-Step Upload</span>
+              </button>
+
+              <button
+                onClick={() => handleOpenAddDestination(false)}
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-white shadow-sm flex items-center gap-1 hover:opacity-95 transition cursor-pointer"
+                style={{ backgroundColor: settings.accentColor }}
+              >
+                <Plus className="w-3.5 h-3.5 shrink-0" />
+                <span>Add Tour</span>
+              </button>
+
+              {/* Notification Bell Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  className="relative p-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 transition"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadNotifsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FF6B35] text-white text-[9px] font-black flex items-center justify-center">
+                      {unreadNotifsCount}
+                    </span>
+                  )}
+                </button>
 
               {notifDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-4 z-50 animate-in fade-in space-y-3">
@@ -898,7 +900,49 @@ export const AdminPanel: React.FC = () => {
                   </div>
                 </div>
               )}
+              </div>
+
+              <button
+                onClick={() => logout()}
+                className="lg:hidden p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30"
+                title="Lock Admin"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
+          </div>
+
+          {/* Mobile & Tablet Horizontal Scrollable Admin Navigation Strip */}
+          <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar px-4 py-2 border-t border-zinc-200/70 dark:border-zinc-800/80">
+            {adminNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActiveTab = currentTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setCurrentTab(item.id as any)}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                    isActiveTab
+                      ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                      : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-300'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActiveTab ? 'text-[#FF6B35]' : 'text-zinc-400'}`} />
+                  <span>{item.label}</span>
+                  {item.count !== undefined && (
+                    <span
+                      className={`px-1.5 py-0.2 rounded-full text-[9px] ${
+                        isActiveTab
+                          ? 'bg-white/20 text-white dark:bg-zinc-900/20 dark:text-zinc-900'
+                          : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200'
+                      }`}
+                    >
+                      {item.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </header>
 

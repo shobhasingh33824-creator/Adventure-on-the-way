@@ -41,60 +41,51 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/50 to-[#FFF8F0] dark:to-[#111111]" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center flex flex-col items-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 text-center flex flex-col items-center">
         {/* Brand Tagline Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-[#FFF8F0] text-xs sm:text-sm font-bold tracking-wide uppercase shadow-lg mb-5">
-          <Sparkles className="w-4 h-4 text-[#FF6B35]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-[#FFF8F0] text-xs font-bold tracking-wide uppercase shadow-md mb-4">
+          <Sparkles className="w-3.5 h-3.5 text-[#FF6B35]" />
           <span>{settings.tagline}</span>
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-poppins font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-tight drop-shadow-xl max-w-4xl">
+        <h1 className="font-poppins font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight drop-shadow-xl max-w-4xl">
           {t('heroTitle')}
         </h1>
 
-        <p className="mt-4 text-sm sm:text-lg md:text-xl text-zinc-200 max-w-3xl font-medium drop-shadow-md leading-relaxed">
-          Uttarakhand&apos;s trusted travel company at <strong>4, Devpura, Haridwar</strong> — Chardham Yatra, Aadi Kailash Om Parvat, Kedarnath, Badrinath, Auli, Chopta, Mussoorie, Nainital &amp; all Himalayan packages.
+        <p className="mt-3 text-sm sm:text-base md:text-lg text-zinc-200 max-w-2xl font-medium drop-shadow-md leading-relaxed">
+          Uttarakhand&apos;s trusted travel company at <strong>4, Devpura, Haridwar</strong> — Chardham Yatra, Aadi Kailash Om Parvat, Kedarnath, Badrinath, Auli, Chopta &amp; Himalayan packages.
         </p>
 
-        {/* All-Device Direct Action Buttons Row */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+        {/* Primary Action Row */}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={() => setActiveTab('destinations')}
-            className="px-5 py-3 rounded-2xl font-poppins font-bold text-xs sm:text-sm text-white shadow-xl hover:opacity-95 transition flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-xl font-poppins font-bold text-xs sm:text-sm text-white shadow-lg hover:opacity-95 transition flex items-center gap-2 cursor-pointer"
             style={{ backgroundColor: settings.accentColor }}
           >
             <Compass className="w-4 h-4" />
-            <span>Explore All 12+ Tour Packages</span>
+            <span>Explore Tour Packages</span>
           </button>
 
           <a
             href={settings.whatsappLink || 'https://wa.me/919421709258?text=Hi%20Adventure%20On%20The%20Way!%20I%20want%20to%20book%20a%20trip.'}
             target="_blank"
             rel="noreferrer"
-            className="px-4 py-3 rounded-2xl font-poppins font-bold text-xs sm:text-sm bg-[#25D366] text-white shadow-xl hover:bg-[#20bd5a] transition flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl font-poppins font-bold text-xs sm:text-sm bg-[#25D366] text-white shadow-lg hover:bg-[#20bd5a] transition flex items-center gap-1.5"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>WhatsApp: +91 94217 09258</span>
+            <span>WhatsApp Desk</span>
           </a>
 
           <a
             href={settings.callLink || 'tel:+919421709258'}
-            className="px-4 py-3 rounded-2xl font-poppins font-bold text-xs sm:text-sm bg-white/95 text-zinc-900 shadow-xl hover:bg-white transition flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl font-poppins font-bold text-xs sm:text-sm bg-white/95 text-zinc-900 shadow-lg hover:bg-white transition flex items-center gap-1.5"
           >
             <Phone className="w-4 h-4 text-[#FF6B35]" />
-            <span>Call Haridwar Office</span>
+            <span>+91 94217 09258</span>
           </a>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('admin')}
-            className="px-4 py-3 rounded-2xl font-poppins font-bold text-xs sm:text-sm bg-[#0B3D2E]/90 text-emerald-300 border border-emerald-400/40 shadow-xl hover:bg-[#0B3D2E] transition flex items-center gap-1.5 cursor-pointer"
-          >
-            <ShieldCheck className="w-4 h-4 text-[#FF6B35]" />
-            <span>Admin Portal (@admin)</span>
-          </button>
         </div>
 
         {/* Interactive Search Bar [Destination, Date, Travellers, Search] */}
